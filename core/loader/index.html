@@ -28,7 +28,7 @@
 
   <div id="browser-block" style="display:none;">
     <div class="outer">
-      <div class="middle" aria-label="This content is blocked" title="This content is blocked">
+      <div class="middle" aria-label="RESTRICTED!" title="RESTRICTED!">
         <div class="content">
           <h1><strong>RESTRICTED!</strong></h1>
           <br />
@@ -53,7 +53,7 @@
     }
 
     if (isPWA) {
-      document.title = 'CheddarOS';
+      document.title = 'created by mhauber';
       const frame = document.getElementById('app-frame');
       frame.src = '/hamburger/core/library/index.html';
       frame.style.display = 'block';
