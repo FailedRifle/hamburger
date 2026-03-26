@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hamburger</title>
-  <link rel="manifest" href="/hamburger/core/scripts/manifest.json">
   <meta name="theme-color" content="#000000">
   <style>
     * { margin: 0; padding: 0; }
@@ -21,12 +20,27 @@
   <iframe id="app-frame" src=""></iframe>
 
   <script>
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    const ALLOW_INSTALL = true;
+
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+    if (ALLOW_INSTALL) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = '/hamburger/core/scripts/manifest.json';
+      document.head.appendChild(link);
+    }
+
+    if (isPWA) {
       const frame = document.getElementById('app-frame');
       frame.src = '/hamburger/core/library/index.html';
       frame.style.display = 'block';
     } else {
       document.getElementById('browser-block').style.display = 'block';
+    }
+
+    if (!ALLOW_INSTALL) {
+      window.addEventListener('beforeinstallprompt', e => e.preventDefault());
     }
 
     if ('serviceWorker' in navigator) {
