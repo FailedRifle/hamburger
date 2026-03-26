@@ -8,9 +8,23 @@
   <meta name="theme-color" content="#000000">
 </head>
 <body>
-  <h1>Hello Hamburger</h1>
+  <div id="browser-block" style="display:none; text-align:center; margin-top:20%;">
+    <h1>🚫 You cannot preview this page</h1>
+    <p>Download the app to access this content.</p>
+  </div>
+
+  <div id="pwa-content" style="display:none; text-align:center; margin-top:20%;">
+    <h1>🧀 Welcome back!</h1>
+    <p>You found the secret message. Nice.</p>
+  </div>
 
   <script>
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      document.getElementById('pwa-content').style.display = 'block';
+    } else {
+      document.getElementById('browser-block').style.display = 'block';
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/hamburger/core/service-worker.js')
         .then(reg => console.log('SW registered:', reg.scope))
