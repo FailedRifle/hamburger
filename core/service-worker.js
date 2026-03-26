@@ -1,4 +1,4 @@
-const CACHE_NAME = "hamburger-v1";
+const CACHE_NAME = "hamburger-v2";
 const ASSETS = [
   "/hamburger/core/loader/",
   "/hamburger/core/loader/index.html",
@@ -26,4 +26,3 @@ self.addEventListener("fetch", event => {
     caches.match(event.request).then(r => r || fetch(event.request))
   );
 });
-
