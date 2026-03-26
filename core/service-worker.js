@@ -1,4 +1,4 @@
-const CACHE_NAME = "hamburger-v1";
+const CACHE_NAME = "vBETA-1.0.0";
 const ASSETS = [
   "/hamburger/core/loader/",
   "/hamburger/core/loader/index.html",
