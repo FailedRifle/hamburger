@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hamburger</title>
+  <title>2</title>
   <link rel="manifest" href="/hamburger/core/scripts/manifest.json">
   <meta name="theme-color" content="#000000">
 </head>
@@ -13,14 +13,20 @@
     <p>Download the app to access this content.</p>
   </div>
 
-  <div id="pwa-content" style="display:none; text-align:center; margin-top:20%;">
-    <h1>🧀 Welcome back!</h1>
-    <p>You found the secret message. Nice.</p>
-  </div>
+  <div id="pwa-content" style="display:none;"></div>
 
   <script>
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      document.getElementById('pwa-content').style.display = 'block';
+      fetch('/hamburger/core/library/index.html')
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById('pwa-content').style.display = 'block';
+          document.getElementById('pwa-content').innerHTML = html;
+        })
+        .catch(() => {
+          document.getElementById('pwa-content').style.display = 'block';
+          document.getElementById('pwa-content').innerHTML = '<p>Failed to load content.</p>';
+        });
     } else {
       document.getElementById('browser-block').style.display = 'block';
     }
