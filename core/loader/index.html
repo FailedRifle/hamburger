@@ -3,30 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2</title>
+  <title>Hamburger</title>
   <link rel="manifest" href="/hamburger/core/scripts/manifest.json">
   <meta name="theme-color" content="#000000">
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; display: none; }
+    #browser-block { display: none; text-align: center; margin-top: 20%; font-family: monospace; color: white; background: black; height: 100%; }
+  </style>
 </head>
 <body>
-  <div id="browser-block" style="display:none; text-align:center; margin-top:20%;">
+  <div id="browser-block">
     <h1>🚫 You cannot preview this page</h1>
     <p>Download the app to access this content.</p>
   </div>
-
-  <div id="pwa-content" style="display:none;"></div>
+  <iframe id="app-frame" src=""></iframe>
 
   <script>
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      fetch('/hamburger/core/library/index.html')
-        .then(res => res.text())
-        .then(html => {
-          document.getElementById('pwa-content').style.display = 'block';
-          document.getElementById('pwa-content').innerHTML = html;
-        })
-        .catch(() => {
-          document.getElementById('pwa-content').style.display = 'block';
-          document.getElementById('pwa-content').innerHTML = '<p>Failed to load content.</p>';
-        });
+      const frame = document.getElementById('app-frame');
+      frame.src = '/hamburger/core/library/index.html';
+      frame.style.display = 'block';
     } else {
       document.getElementById('browser-block').style.display = 'block';
     }
