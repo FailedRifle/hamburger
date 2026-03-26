@@ -1,7 +1,22 @@
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/my-pwa/service-worker.js');
-  }
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamburger</title>
+  <link rel="manifest" href="/hamburger/core/manifest.json">
+  <meta name="theme-color" content="#000000">
+</head>
+<body>
+
+  <!-- your content here -->
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/hamburger/core/service-worker.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.error('SW failed:', err));
+    }
+  </script>
+</body>
+</html>
