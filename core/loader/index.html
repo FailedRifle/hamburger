@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <title aria-label="RESTRICTED!">RESTRICTED!</title>
+  <title aria-label="This content is blocked">This content is blocked!</title>
   <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="//fonts.googleapis.com/css?family=Roboto:400,100,700,900" rel="stylesheet" type="text/css">
   <link href="/hamburger/core/loader/blocked.png" rel="icon" type="image/png">
@@ -42,9 +42,7 @@
   <iframe id="app-frame" src=""></iframe>
 
   <script>
-    const ALLOW_INSTALL = true;
-
-    const FAKE_URL = 'https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms/edit';
+    const ALLOW_INSTALL = false;
 
     const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 
@@ -56,14 +54,13 @@
     }
 
     if (isPWA) {
+      document.title = 'CheddarOS';
       const frame = document.getElementById('app-frame');
       frame.src = '/hamburger/core/library/index.html';
       frame.style.display = 'block';
     } else {
+      document.title = 'This content is blocked!';
       document.getElementById('browser-block').style.display = 'block';
-
-      // Mask the URL in the address bar
-      window.history.replaceState(null, '', FAKE_URL);
     }
 
     if (!ALLOW_INSTALL) {
