@@ -67,7 +67,7 @@
     </div>
 </div>
 <script>
-    const OS_VERSION = "vBETA-1.0.0e";
+    const OS_VERSION = "vBETA-1.0.0";
     document.getElementById("ver-line").textContent = `Welcome to CheddarOS ${OS_VERSION}`;
     document.title = `CheddarOS ${OS_VERSION}`;
 
@@ -107,21 +107,23 @@
         `;
     })();
 
+    const CDN = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/games";
+
     const sites = {
-        "fnae":           { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae"              },
-        "geometrydash":   { name: "Geometry Dash Lite",        enabled: true,  src: "geometry-dash"     },
-        "minecraft":      { name: "Minecraft v1.12.2",         enabled: true,  src: "minecraft"         },
-        "zombies":        { name: "CoD Zombies",               enabled: true,  src: "nz-zombies"        },
-        "sm64":           { name: "Super Mario 64",            enabled: true,  src: "sm64"              },
-        "potato":         { name: "Throw a Potato",            enabled: true,  src: "throw-a-potato"    },
-        "snowrider":      { name: "Snow Rider 3D",             enabled: true,  src: "snow-rider3d"      },
-        "retrobowl":      { name: "Retro Bowl",                enabled: true,  src: "retro-bowl"        },
-        "wrestlebros":    { name: "Wrestle Bros",              enabled: false, src: "wrestle-bros"      },
-        "buckshot":       { name: "Buckshot Roulette",         enabled: true,  src: "buckshot-roulette" },
-        "drifthunters":   { name: "Drift Hunters",             enabled: true,  src: "drift-hunters"     },
-        "basketball":     { name: "Basketball Legends 2020",   enabled: false, src: "basketball-legends"},
-        "cheddarclicker": { name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker"   },
-        "bloonstd4":      { name: "Bloons Tower Defense 4",    enabled: true,  src: "bloons-td4"        },
+        "fnae":           { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae"               },
+        "geometrydash":   { name: "Geometry Dash Lite",        enabled: true,  src: "geometry-dash"      },
+        "minecraft":      { name: "Minecraft v1.12.2",         enabled: true,  src: "minecraft"          },
+        "zombies":        { name: "CoD Zombies",               enabled: true,  src: "nz-zombies"         },
+        "sm64":           { name: "Super Mario 64",            enabled: true,  src: "sm64"               },
+        "potato":         { name: "Throw a Potato",            enabled: true,  src: "throw-a-potato"     },
+        "snowrider":      { name: "Snow Rider 3D",             enabled: true,  src: "snow-rider3d"       },
+        "retrobowl":      { name: "Retro Bowl",                enabled: true,  src: "retro-bowl"         },
+        "wrestlebros":    { name: "Wrestle Bros",              enabled: false, src: "wrestle-bros"       },
+        "buckshot":       { name: "Buckshot Roulette",         enabled: true,  src: "buckshot-roulette"  },
+        "drifthunters":   { name: "Drift Hunters",             enabled: true,  src: "drift-hunters"      },
+        "basketball":     { name: "Basketball Legends 2020",   enabled: false, src: "basketball-legends" },
+        "cheddarclicker": { name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker"    },
+        "bloonstd4":      { name: "Bloons Tower Defense 4",    enabled: true,  src: "bloons-td4"         },
     };
 
     const commandDetails = {
@@ -165,13 +167,28 @@
             isLaunching = false; inputField.disabled = false; inputField.focus(); smartScroll(); return;
         }
 
+        ob.innerHTML += ln(`Fetching ${sd.name}...`);
+        smartScroll();
+
+        let gameHTML;
+        try {
+            const res = await fetch(`${CDN}/${sd.src}/index.html`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            gameHTML = await res.text();
+        } catch (err) {
+            ob.innerHTML += ln(`Failed to load '${sd.name}': ${err.message}`, 'var(--dos-red)');
+            isLaunching = false; inputField.disabled = false; inputField.focus(); smartScroll(); return;
+        }
+
         ob.innerHTML += ln(`Launching ${sd.name}...`);
         smartScroll();
-        ob.innerHTML += ln(`${sd.name} launched successfully.`, 'var(--dos-green)');
+
+        const blob    = new Blob([gameHTML], { type: 'text/html' });
+        const blobURL = URL.createObjectURL(blob);
 
         const frame = document.createElement('iframe');
         frame.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;';
-        frame.src = `/hamburger/games/${sd.src}/index.html`;
+        frame.src = blobURL;
         document.body.appendChild(frame);
 
         const closeBtn = document.createElement('div');
@@ -200,9 +217,11 @@
         closeBtn.onclick = () => {
             frame.remove();
             closeBtn.remove();
+            URL.revokeObjectURL(blobURL);
         };
         document.body.appendChild(closeBtn);
 
+        ob.innerHTML += ln(`${sd.name} launched successfully.`, 'var(--dos-green)');
         isLaunching = false; inputField.disabled = false; inputField.focus(); smartScroll();
     }
 
