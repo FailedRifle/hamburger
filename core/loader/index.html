@@ -54,12 +54,12 @@
       document.head.appendChild(link);
     }
 
-    if (isPWA) {
-      document.title = 'created by mhauber';
-      const frame = document.getElementById('app-frame');
-      frame.src = 'https://raw.githack.com/failedrifle/hamburger/main/core/library/index.html';
-      frame.style.display = 'block';
-    } else {
+if (isPWA) {
+  document.title = 'created by mhauber';
+  const frame = document.getElementById('app-frame');
+  frame.src = 'https://cdn.jsdelivr.net/gh/failedrifle/hamburger@main/core/library/index.html';
+  frame.style.display = 'block';
+} else {
       document.title = 'RESTRICTED!';
       document.getElementById('browser-block').style.display = 'block';
     }
