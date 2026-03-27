@@ -5,14 +5,14 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --dos-bg:     #000000;
-            --dos-box:    #0000aa;
-            --dos-white:  #ffffff;
-            --dos-gray:   #aaaaaa;
+            --dos-bg:      #000000;
+            --dos-box:     #0000aa;
+            --dos-white:   #ffffff;
+            --dos-gray:    #aaaaaa;
             --dos-yellow: #ffff55;
-            --dos-cyan:   #55ffff;
-            --dos-red:    #ff5555;
-            --dos-green:  #55ff55;
+            --dos-cyan:    #55ffff;
+            --dos-red:     #ff5555;
+            --dos-green:   #55ff55;
         }
         html, body { width: 100%; height: 100%; overflow: hidden; background: var(--dos-bg); }
         .dos-shell {
@@ -108,11 +108,11 @@
     })();
 
     const sites = {
-        "fnae":           { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae"              },
-        "geometrydash":   { name: "Geometry Dash Lite",        enabled: true,  src: "geometry-dash"     },
-        "minecraft":      { name: "Minecraft v1.12.2",         enabled: true,  src: "minecraft"         },
-        "zombies":        { name: "CoD Zombies",               enabled: true,  src: "nz-zombies"        },
-        "sm64":           { name: "Super Mario 64",            enabled: true,  src: "sm64"              },
+        "fnae":           { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae"               },
+        "geometrydash":   { name: "Geometry Dash Lite",        enabled: true,  src: "geometry-dash"      },
+        "minecraft":      { name: "Minecraft v1.12.2",         enabled: true,  src: "minecraft"          },
+        "zombies":        { name: "CoD Zombies",               enabled: true,  src: "nz-zombies"         },
+        "sm64":           { name: "Super Mario 64",            enabled: true,  src: "sm64"               },
         "potato":         { name: "Throw a Potato",            enabled: true,  src: "throw-a-potato"    },
         "snowrider":      { name: "Snow Rider 3D",             enabled: true,  src: "snow-rider3d"      },
         "retrobowl":      { name: "Retro Bowl",                enabled: true,  src: "retro-bowl"        },
@@ -121,7 +121,7 @@
         "drifthunters":   { name: "Drift Hunters",             enabled: true,  src: "drift-hunters"     },
         "basketball":     { name: "Basketball Legends 2020",   enabled: false, src: "basketball-legends"},
         "cheddarclicker": { name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker"   },
-        "bloonstd4":      { name: "Bloons Tower Defense 4",    enabled: true,  src: "bloons-td4"        },
+        "bloonstd4":      { name: "Bloons Tower Defense 4",    enabled: true,  src: "bloons-td4"         },
     };
 
     const commandDetails = {
@@ -167,41 +167,46 @@
 
         ob.innerHTML += ln(`Launching ${sd.name}...`);
         smartScroll();
-        ob.innerHTML += ln(`${sd.name} launched successfully.`, 'var(--dos-green)');
 
-        const frame = document.createElement('iframe');
-        frame.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;';
-        frame.src = `https://cdn.jsdelivr.net/gh/failedrifle/hamburger@main/games/${sd.src}/index.html`;
-        document.body.appendChild(frame);
+        try {
+            const url = `https://cdn.jsdelivr.net/gh/failedrifle/hamburger@main/games/${sd.src}/index.html`;
+            const response = await fetch(url);
+            const html = await response.text();
 
-        const closeBtn = document.createElement('div');
-        closeBtn.innerText = '✕';
-        closeBtn.style.cssText = `
-            position:fixed;
-            top:10px;
-            right:10px;
-            z-index:10000;
-            background:#960019;
-            color:#ffffff;
-            font-family:'Lucida Console','Courier New',monospace;
-            font-size:11px;
-            font-weight:bold;
-            padding:5px 10px;
-            cursor:pointer;
-            border:2px solid #ffffff;
-            box-shadow:2px 2px 0px #000000;
-            user-select:none;
-            opacity:1;
-            transition:opacity 0.5s;
-        `;
-        closeBtn.onmouseenter = () => closeBtn.style.opacity = '1';
-        closeBtn.onmouseleave = () => closeBtn.style.opacity = '0.15';
-        setTimeout(() => { closeBtn.style.opacity = '0.15'; }, 2000);
-        closeBtn.onclick = () => {
-            frame.remove();
-            closeBtn.remove();
-        };
-        document.body.appendChild(closeBtn);
+            // Create frame but keep it hidden until srcdoc is set
+            const frame = document.createElement('iframe');
+            frame.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;background:#000;';
+            
+            // The <base> tag fixes the "raw file" assets (js/images)
+            const baseTag = `<base href="https://cdn.jsdelivr.net/gh/failedrifle/hamburger@main/games/${sd.src}/">`;
+            frame.srcdoc = baseTag + html;
+            
+            document.body.appendChild(frame);
+            ob.innerHTML += ln(`${sd.name} launched successfully.`, 'var(--dos-green)');
+
+            const closeBtn = document.createElement('div');
+            closeBtn.innerText = '✕';
+            closeBtn.style.cssText = `
+                position:fixed; top:10px; right:10px; z-index:10000;
+                background:#960019; color:#ffffff; font-family:'Lucida Console','Courier New',monospace;
+                font-size:11px; font-weight:bold; padding:5px 10px;
+                cursor:pointer; border:2px solid #ffffff;
+                box-shadow:2px 2px 0px #000000; user-select:none;
+                opacity:1; transition:opacity 0.5s;
+            `;
+            closeBtn.onmouseenter = () => closeBtn.style.opacity = '1';
+            closeBtn.onmouseleave = () => closeBtn.style.opacity = '0.15';
+            setTimeout(() => { closeBtn.style.opacity = '0.15'; }, 2000);
+            
+            closeBtn.onclick = () => {
+                frame.remove();
+                closeBtn.remove();
+            };
+            document.body.appendChild(closeBtn);
+        } catch (err) {
+            ob.innerHTML += ln(`CDN Error: Could not fetch game file.`, 'var(--dos-red)');
+            console.error(err);
+        }
 
         isLaunching = false; inputField.disabled = false; inputField.focus(); smartScroll();
     }
@@ -283,7 +288,7 @@
         else if (userInput === "changelog") {
             ob.innerHTML += blank() + changelog(
                 "--- CHANGELOG ---",
-                "3/99/2026$vBETA-1.0.0a$- Finally out of alpha and into open beta$- Revamped UI again to be more unique$- Console, games, and the password are now under 1 tab$- Welcoming new testers to CheddarOS",
+                "3/26/2026$vBETA-1.0.0a$- Fixed PWA raw file loading issue$- Implemented CDN injection logic$- Unified game frame origins",
                 "3/14/2026$vALPHA-2.1.3$- Fixed Bloons TD4",
                 "3/13/2026$vALPHA-2.1.2$- Added Bloons TD4$- Fixed formatting$- Minor bug fixes",
                 "3/11/2026$vALPHA-2.1.1$- Added Basketball Legends$- Basketball Legends offline while looking for GoGuardian bypass",
