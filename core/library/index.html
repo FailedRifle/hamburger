@@ -67,7 +67,7 @@
     </div>
 </div>
 <script>
-    const OS_VERSION = "vBETA-1.0.0";
+    const OS_VERSION = "vBETA-1.0.0a";
     document.getElementById("ver-line").textContent = `Welcome to CheddarOS ${OS_VERSION}`;
     document.title = `CheddarOS ${OS_VERSION}`;
 
@@ -80,7 +80,7 @@
 
     async function getFailedRifleStats() {
         try {
-            const commitRes = await fetch('https://api.github.com/repos/FailedRifle/math/commits/main');
+            const commitRes = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits/main');
             const commitData = await commitRes.json();
             const formatter = new Intl.DateTimeFormat('en-US', {
                 year: 'numeric', month: '2-digit', day: '2-digit',
@@ -90,7 +90,7 @@
             githubLastUpdate = formatter.format(new Date(commitData.commit.committer.date)).replace(',', '');
         } catch { githubLastUpdate = "Unavailable"; }
         try {
-            const response = await fetch('https://api.github.com/repos/FailedRifle/math/commits?sha=main&per_page=100');
+            const response = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=100');
             const commits = await response.json();
             githubCommitCount = Array.isArray(commits) ? commits.length : "Not found";
         } catch { githubCommitCount = "Unavailable"; }
@@ -110,20 +110,21 @@
     const CDN = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/games";
 
     const sites = {
-        "fnae":           { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae"               },
-        "geometrydash":   { name: "Geometry Dash Lite",        enabled: true,  src: "geometry-dash"      },
-        "minecraft":      { name: "Minecraft v1.12.2",         enabled: true,  src: "minecraft"          },
-        "zombies":        { name: "CoD Zombies",               enabled: true,  src: "nz-zombies"         },
-        "sm64":           { name: "Super Mario 64",            enabled: true,  src: "sm64"               },
-        "potato":         { name: "Throw a Potato",            enabled: true,  src: "throw-a-potato"     },
-        "snowrider":      { name: "Snow Rider 3D",             enabled: true,  src: "snow-rider3d"       },
-        "retrobowl":      { name: "Retro Bowl",                enabled: true,  src: "retro-bowl"         },
-        "wrestlebros":    { name: "Wrestle Bros",              enabled: false, src: "wrestle-bros"       },
-        "buckshot":       { name: "Buckshot Roulette",         enabled: true,  src: "buckshot-roulette"  },
-        "drifthunters":   { name: "Drift Hunters",             enabled: true,  src: "drift-hunters"      },
-        "basketball":     { name: "Basketball Legends 2020",   enabled: false, src: "basketball-legends" },
-        "cheddarclicker": { name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker"    },
-        "bloonstd4":      { name: "Bloons Tower Defense 4",    enabled: true,  src: "bloons-td4"         },
+        "fnae": { name: "Five Nights at Epstein's", enabled: true, src: "fnae"},
+        "geometrydash": { name: "Geometry Dash Lite", enabled: true, src: "geometry-dash"},
+        "minecraft": { name: "Minecraft v1.12.2", enabled: true, src: "minecraft"},
+        "zombies": { name: "CoD Zombies", enabled: true, src: "nz-zombies"},
+        "sm64": { name: "Super Mario 64", enabled: true, src: "sm64"},
+        "potato": { name: "Throw a Potato", enabled: true, src: "throw-a-potato"},
+        "snowrider": { name: "Snow Rider 3D", enabled: true, src: "snow-rider3d"},
+        "retrobowl": { name: "Retro Bowl", enabled: true, src: "retro-bowl"},
+        "wrestlebros": { name: "Wrestle Bros", enabled: false, src: "wrestle-bros"},
+        "buckshot": { name: "Buckshot Roulette", enabled: true, src: "buckshot-roulette"},
+        "drifthunters": { name: "Drift Hunters", enabled: true, src: "drift-hunters"},
+        "basketball": { name: "Basketball Legends 2020", enabled: false, src: "basketball-legends"},
+        "ide": { name: "CheddarOS IDE", enabled: true, src: "cheddar-ide" },
+        "cheddarclicker": { name: "Cheddar Clicker", enabled: true, src: "cheddar-clicker"},
+        "bloonstd4": { name: "Bloons Tower Defense 4", enabled: true, src: "bloons-td4"},
     };
 
     const commandDetails = {
@@ -209,7 +210,7 @@
             box-shadow:2px 2px 0px #000000;
             user-select:none;
             opacity:1;
-            transition:opacity 0.5s;
+            transition:opacity 1.5s;
         `;
         closeBtn.onmouseenter = () => closeBtn.style.opacity = '1';
         closeBtn.onmouseleave = () => closeBtn.style.opacity = '0.15';
