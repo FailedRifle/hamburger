@@ -1,285 +1,656 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cheddarGPT</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    
-    <style>
-        :root {
-            --bg-color: #131314;
-            --text-main: #e3e3e3;
-            --text-secondary: #c4c7c5;
-            --accent-blue: #a8c7fa;
-            --input-bg: #1e1f20;
-            --user-msg-bg: #282a2d;
-            --border-color: #444746;
-            --code-header: #2d2f31;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheddarOS vBETA-1.0.0c</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #1a1a1a;
+    --sidebar-bg: #111111;
+    --panel-bg: #222222;
+    --card-bg: #2a2a2a;
+    --border: #333333;
+    --text: #e0e0e0;
+    --text-dim: #888888;
+    --text-muted: #555555;
+    --accent: #ffffff;
+    --red: #cc3333;
+    --green: #44aa44;
+    --yellow: #ccaa00;
+    --header-h: 56px;
+    --sidebar-w: 220px;
+    --font: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; height: 100vh; background: var(--bg-color); color: var(--text-main); overflow: hidden; }
+  /* ── LAYOUT ── */
+  #app { display: flex; flex-direction: column; height: 100vh; }
 
-        /* --- Gemini Layout & Chat Container --- */
-        #main-content { height: 100%; display: flex; flex-direction: column; max-width: 1000px; margin: 0 auto; position: relative; }
-        #chat-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 24px; scroll-behavior: smooth; opacity: 0; transition: opacity 0.5s ease; }
-        body.active #chat-container { opacity: 1; }
-        #chat-display { width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; padding-bottom: 150px; }
+  /* ── TOP HEADER ── */
+  #header {
+    display: flex; align-items: center;
+    height: var(--header-h); min-height: var(--header-h);
+    border-bottom: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    flex-shrink: 0;
+  }
+  #logo {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    padding: 0 16px; border-right: 1px solid var(--border);
+    height: 100%; display: flex; flex-direction: column; justify-content: center;
+  }
+  #logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); line-height: 1; }
+  #logo .ver { font-size: 11px; color: var(--text-dim); margin-left: 2px; }
+  #logo .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-        /* --- Message Styling --- */
-        .msg-wrapper { display: flex; width: 100%; }
-        .msg-wrapper.user { justify-content: flex-end; }
-        .msg { line-height: 1.6; font-size: 16px; max-width: 85%; overflow-wrap: break-word; color: var(--text-main); }
-        .user .msg { background: var(--user-msg-bg); padding: 14px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+  #nav { display: flex; align-items: center; gap: 0; height: 100%; padding: 0 20px; }
+  .nav-btn {
+    background: none; border: none; color: var(--text-dim);
+    font-family: var(--font); font-size: 14px; font-weight: 500;
+    padding: 0 24px; height: 100%; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+    transition: color 0.15s;
+    position: relative;
+  }
+  .nav-btn:hover { color: var(--accent); }
+  .nav-btn.active { color: var(--accent); font-weight: 700; }
+  .nav-btn.active::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--accent);
+  }
 
-        /* --- Gemini-Exact Markdown Formatting --- */
-        .msg strong, .msg b { color: #ffffff; font-weight: 600; }
-        .msg p { margin-bottom: 16px; }
-        .msg ul, .msg ol { margin: 8px 0 16px 28px; }
-        .msg li { margin-bottom: 8px; padding-left: 4px; }
-        .msg li::marker { color: var(--accent-blue); font-weight: bold; }
-        .msg h1, .msg h2, .msg h3 { margin: 24px 0 12px 0; color: #ffffff; font-weight: 500; }
-        .msg h1 { font-size: 22px; } .msg h2 { font-size: 20px; } .msg h3 { font-size: 18px; }
-        
-        .msg table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
-        .msg th, .msg td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
-        .msg th { background: rgba(255,255,255,0.05); color: var(--accent-blue); }
+  /* ── BODY ── */
+  #body { display: flex; flex: 1; overflow: hidden; }
 
-        /* Inline code snippets */
-        .msg :not(pre) > code {
-            background: rgba(255,255,255,0.1);
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; flex-shrink: 0;
+    padding-top: 8px;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); }
 
-        /* Full Code Blocks */
-        .code-container { margin: 16px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); background: #000; }
-        .code-header { background: var(--code-header); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 12px; color: var(--text-secondary); }
-        .copy-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; }
+  .sidebar-section { margin-bottom: 4px; }
+  .sidebar-header {
+    padding: 10px 16px 6px;
+    font-size: 12px; font-weight: 700; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .sidebar-item {
+    display: block; width: 100%; background: none; border: none;
+    text-align: left; padding: 7px 16px;
+    font-family: var(--font); font-size: 14px; color: var(--text);
+    cursor: pointer; transition: background 0.1s, color 0.1s;
+  }
+  .sidebar-item:hover { background: var(--panel-bg); }
+  .sidebar-item.active { background: var(--border); color: var(--accent); font-weight: 600; }
+  .sidebar-item.offline { color: var(--red); }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
 
-        /* --- UI Elements & Animation --- */
-        footer { position: absolute; width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); z-index: 10; }
-        body.active footer { top: 90%; }
-        .greeting-container { width: 100%; max-width: 800px; margin-bottom: 12px; transition: opacity 0.3s; }
-        body.active .greeting-container { opacity: 0; pointer-events: none; height: 0; margin: 0; }
-        .hello-text { font-size: 44px; font-weight: 500; color: #ffffff; }
+  /* ── MAIN CONTENT ── */
+  #main { flex: 1; overflow-y: auto; background: var(--bg); }
+  #main::-webkit-scrollbar { width: 6px; }
+  #main::-webkit-scrollbar-thumb { background: var(--border); }
 
-        .input-container { width: 100%; max-width: 800px; background: var(--input-bg); border-radius: 28px; border: 1px solid var(--border-color); }
-        #input-preview-area { display: none; padding: 16px 16px 0; }
-        .text-area-row { display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
-        textarea { flex: 1; border: none; background: transparent; outline: none; padding: 8px 0; font-size: 16px; resize: none; max-height: 180px; color: var(--text-main); font-family: inherit; }
-        .action-btn { background: transparent; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+  .page { display: none; padding: 28px 32px; }
+  .page.active { display: block; }
 
-        .chat-sent-img { width: 150px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); }
-        .streaming::after { content: ' 🧀'; animation: blink 1s infinite; color: var(--accent-blue); }
-        @keyframes blink { 50% { opacity: 0; } }
-        body.busy .action-btn, body.busy textarea { opacity: 0.5; cursor: not-allowed; }
-    </style>
+  /* ── HOME PAGE ── */
+  .home-whats-new { margin-bottom: 32px; }
+  .home-whats-new h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .home-whats-new .ver-tag { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
+  .home-whats-new p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+  .changelog-preview { margin-top: 12px; }
+  .changelog-entry {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px 18px; margin-bottom: 10px;
+  }
+  .changelog-entry .entry-ver { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .changelog-entry .entry-date { font-size: 11px; color: var(--text-muted); margin-left: 10px; }
+  .changelog-entry ul { margin-top: 8px; padding-left: 18px; }
+  .changelog-entry li { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+  .home-popular h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; }
+  .popular-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+  .popular-card {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden; cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .popular-card:hover { border-color: #666; transform: translateY(-2px); }
+  .popular-card .card-img {
+    width: 100%; aspect-ratio: 4/3; background: var(--card-bg);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .popular-card .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .popular-card .card-img .no-img {
+    font-size: 11px; color: var(--text-muted); text-align: center;
+  }
+  .popular-card .card-label {
+    padding: 8px 10px; font-size: 12px; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ── INFO PAGE ── */
+  .info-title {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    display: inline-block; padding: 10px 24px; margin-bottom: 24px; border-radius: 2px;
+  }
+  .info-title h2 { font-size: 18px; font-weight: 700; color: var(--accent); }
+  .info-title .ver { font-size: 12px; color: var(--text-dim); }
+  .info-cards { display: flex; gap: 16px; flex-wrap: wrap; }
+  .info-card {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 20px 28px; min-width: 200px; text-align: center;
+  }
+  .info-card .ic-label { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .info-card .ic-value { font-size: 13px; color: var(--text-dim); }
+
+  /* ── CHANGELOGS PAGE ── */
+  .changelog-list { }
+  .cl-entry {
+    border-bottom: 1px solid var(--border); padding: 14px 0;
+  }
+  .cl-entry:first-child { padding-top: 0; }
+  .cl-ver { font-size: 14px; font-weight: 700; color: var(--accent); }
+  .cl-date { font-size: 12px; color: var(--text-muted); margin-left: 10px; }
+  .cl-items { margin-top: 6px; padding-left: 16px; }
+  .cl-items li { font-size: 13px; color: var(--text-dim); line-height: 1.75; }
+
+  /* ── CREDITS PAGE ── */
+  .credits-section { margin-bottom: 28px; }
+  .credits-role {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    display: inline-block; padding: 6px 18px; margin-bottom: 10px;
+    font-size: 14px; font-weight: 600; color: var(--accent);
+  }
+  .credits-people { padding-left: 16px; margin-bottom: 4px; }
+  .credits-people li { font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+  .credits-disclaimer {
+    margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-muted); font-style: italic;
+  }
+
+  /* ── GAME PAGE ── */
+  #game-page { display: none; padding: 0; flex-direction: column; }
+  #game-page.active { display: flex; }
+  .game-banner {
+    width: 100%; background: var(--panel-bg);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 280px; border-bottom: 1px solid var(--border); overflow: hidden;
+  }
+  .game-banner img { width: 100%; max-height: 320px; object-fit: cover; }
+  .game-banner .no-banner {
+    width: 100%; height: 280px; display: flex; align-items: center; justify-content: center;
+    background: var(--panel-bg); color: var(--text-muted); font-size: 14px;
+  }
+  .game-meta {
+    display: flex; align-items: center; gap: 0;
+    background: var(--card-bg); border-bottom: 1px solid var(--border);
+  }
+  .game-play-btn {
+    background: var(--card-bg); border: none; border-right: 1px solid var(--border);
+    color: var(--accent); font-family: var(--font); font-size: 15px; font-weight: 700;
+    padding: 14px 32px; cursor: pointer; transition: background 0.15s;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .game-play-btn:hover { background: #333; }
+  .game-name-bar {
+    padding: 14px 20px; font-size: 15px; font-weight: 600; color: var(--text);
+  }
+  .game-desc-box {
+    margin: 24px 32px; background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 24px; font-size: 14px; color: var(--text-dim); line-height: 1.6;
+    text-align: center;
+  }
+  .game-offline-notice {
+    margin: 24px 32px; padding: 14px 20px;
+    background: #2a0000; border: 1px solid var(--red);
+    border-radius: 4px; font-size: 14px; color: var(--red);
+  }
+
+  /* ── TOOL PAGE ── */
+  #tool-page { display: none; padding: 0; flex-direction: column; }
+  #tool-page.active { display: flex; }
+  .tool-header {
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    font-size: 16px; font-weight: 600; color: var(--accent);
+    background: var(--panel-bg);
+  }
+  .tool-frame-wrap { flex: 1; background: var(--card-bg); display: flex; align-items: center; justify-content: center; }
+  .tool-placeholder { font-size: 14px; color: var(--text-muted); }
+
+  /* notice bar */
+  #notice-bar {
+    background: #2a0000; border-bottom: 1px solid var(--red);
+    padding: 6px 32px; font-size: 12px; color: var(--red); font-weight: 600;
+    flex-shrink: 0;
+  }
+</style>
 </head>
 <body>
+<div id="app">
 
-    <div id="main-content">
-        <div id="chat-container">
-            <div id="chat-display"></div>
-        </div>
+  <!-- HEADER -->
+  <div id="header">
+    <div id="logo">
+      <h1>CheddarOS <span class="ver" id="logo-ver"></span></h1>
+      <div class="sub">created by mhauber</div>
+    </div>
+    <nav id="nav">
+      <button class="nav-btn active" data-tab="home">HOME</button>
+      <button class="nav-btn" data-tab="info">INFO</button>
+      <button class="nav-btn" data-tab="changelogs">CHANGELOGS</button>
+      <button class="nav-btn" data-tab="credits">CREDITS</button>
+    </nav>
+  </div>
 
-        <footer>
-            <div class="greeting-container">
-                <div class="hello-text">🧀 Hello, Cheddar</div>
-                <div style="color: var(--text-secondary); font-size: 18px; margin-top: 4px;">What can I help you with?</div>
-            </div>
-            
-            <div class="input-container">
-                <div id="input-preview-area"></div>
-                <div class="text-area-row">
-                    <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect(event)">
-                    <button class="action-btn" onclick="document.getElementById('file-input').click()">＋</button>
-                    <textarea id="user-prompt" placeholder="Message cheddarGPT" rows="1"></textarea>
-                    <button id="run-btn" class="action-btn" onclick="handleSend()" style="color: var(--accent-blue); font-weight: bold;">➤</button>
-                </div>
-            </div>
-            <div style="display: flex; gap: 15px; margin-top: 12px;">
-                <div id="version-tag" style="font-size: 11px; color: #8e918f;">cheddarGPT v3.3 - Stable</div>
-                <div onclick="location.reload()" style="font-size: 11px; color: var(--accent-blue); cursor: pointer;">Clear Chat</div>
-            </div>
-        </footer>
+  <!-- NOTICE BAR -->
+  <div id="notice-bar" style="display:none"></div>
+
+  <!-- BODY -->
+  <div id="body">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-header">- ALL GAMES</div>
+        <div id="games-sidebar"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">- TOOLS</div>
+        <div id="tools-sidebar"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">- OFFLINE GAMES</div>
+        <div id="offline-sidebar"></div>
+      </div>
     </div>
 
-    <script>
-        const API_KEY = "AIzaSyD1xJ2yu6vQ0c6Yk5dozIqh_57QiWG7JgU"; 
-        const MODEL_ID = "gemini-2.5-flash-lite";      // models [gemini-2.5-flash-lite], [gemini-2.5-pro]
-        const DEBUG_MODE = false; 
+    <!-- MAIN -->
+    <div id="main">
 
-        const chatDisplay = document.getElementById('chat-display');
-        const promptInput = document.getElementById('user-prompt');
-        const previewArea = document.getElementById('input-preview-area');
-        
-        let currentAttachment = null;
-        let isFirstMessage = true;
-        let isGenerating = false;
+      <!-- HOME -->
+      <div class="page active" id="page-home">
+        <div class="home-whats-new">
+          <h2>What's new?</h2>
+          <div class="ver-tag" id="home-ver"></div>
+          <div class="changelog-preview" id="home-changelog-preview"></div>
+        </div>
+        <div class="home-popular">
+          <h3>Popular Games (icon.png under games/ game name)</h3>
+          <div class="popular-grid" id="popular-grid"></div>
+        </div>
+      </div>
 
-        const renderer = new marked.Renderer();
-        renderer.code = function(args) {
-            const code = args.text || "";
-            const lang = args.lang || "text";
-            const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            return `<div class="code-container"><div class="code-header"><span>${lang}</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-${lang}">${escapedCode}</code></pre></div>`;
-        };
-        marked.setOptions({ renderer: renderer, breaks: true });
+      <!-- INFO -->
+      <div class="page" id="page-info">
+        <div class="info-title">
+          <h2>CheddarOS Information</h2>
+          <div class="ver" id="info-ver"></div>
+        </div>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="ic-label">Last Updated</div>
+            <div class="ic-value" id="ic-updated">Loading...</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">Version</div>
+            <div class="ic-value" id="ic-commits">Loading...</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">Blocked by GoGuardian</div>
+            <div class="ic-value" id="ic-blocked">1</div>
+          </div>
+        </div>
+      </div>
 
-        window.copyCode = (btn) => {
-            const code = btn.parentElement.nextElementSibling.innerText;
-            navigator.clipboard.writeText(code);
-            btn.innerText = "Copied!";
-            setTimeout(() => btn.innerText = "Copy", 2000);
-        };
+      <!-- CHANGELOGS -->
+      <div class="page" id="page-changelogs">
+        <div class="changelog-list" id="changelog-list"></div>
+      </div>
 
-        async function handleSend() {
-            const text = promptInput.value.trim();
-            if ((!text && !currentAttachment) || isGenerating) return;
+      <!-- CREDITS -->
+      <div class="page" id="page-credits">
+        <div id="credits-content"></div>
+      </div>
 
-            isGenerating = true;
-            document.body.classList.add('busy');
+      <!-- GAME PAGE -->
+      <div id="game-page">
+        <div class="game-banner" id="game-banner">
+          <div class="no-banner">No image</div>
+        </div>
+        <div class="game-meta">
+          <button class="game-play-btn" id="game-play-btn">PLAY</button>
+          <div class="game-name-bar" id="game-name-bar">Game name</div>
+        </div>
+        <div id="game-desc-area"></div>
+      </div>
 
-            if (isFirstMessage) {
-                document.body.classList.add('active');
-                isFirstMessage = false;
-            }
+      <!-- TOOL PAGE -->
+      <div id="tool-page">
+        <div class="tool-header" id="tool-header">Tool name</div>
+        <div class="tool-frame-wrap">
+          <div class="tool-placeholder">Write the tool html here</div>
+        </div>
+      </div>
 
-            const userMsgDiv = createMessageElement(text, 'user');
-            if (currentAttachment && currentAttachment.isImage) {
-                userMsgDiv.innerHTML = `<img src="${currentAttachment.src}" class="chat-sent-img"><br>` + userMsgDiv.innerHTML;
-            }
+    </div>
+  </div>
+</div>
 
-            const savedAttachment = currentAttachment;
-            clearAttachment();
-            promptInput.value = '';
-            promptInput.style.height = 'auto';
+<script>
+const OS_VERSION = "vBETA-1.0.0c";
+document.getElementById("logo-ver").textContent = OS_VERSION;
+document.getElementById("home-ver").textContent = OS_VERSION;
+document.getElementById("info-ver").textContent = OS_VERSION;
+document.title = `CheddarOS ${OS_VERSION}`;
 
-            const botMsgDiv = createMessageElement('', 'bot');
-            botMsgDiv.classList.add('streaming');
-
-if (DEBUG_MODE) {
-    botMsgDiv.innerHTML = ""; // Clear any leftover markdown artifacts
-    await simulateStreaming("## 🧀 Debug Mode Active\nThis is a simulated response to test your UI without spending credits.", botMsgDiv);
-} else {
-    await callAPI(text, savedAttachment, botMsgDiv);
+const ANNOUNCEMENT_TEXT = "nigga heil hitler";
+if (ANNOUNCEMENT_TEXT.trim()) {
+  const nb = document.getElementById("notice-bar");
+  nb.style.display = "block";
+  nb.textContent = "[NOTICE] " + ANNOUNCEMENT_TEXT;
 }
 
-            botMsgDiv.classList.remove('streaming'); 
-            isGenerating = false;
-            document.body.classList.remove('busy');
-        }
+const gameDirectory = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/games";
+const toolDirectory = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/core/library/tools";
 
-        async function callAPI(text, attachment, botMsgDiv) {
-            const parts = [];
-            if (text) parts.push({ text: text });
-            if (attachment) parts.push({ inline_data: { mime_type: attachment.mime_type, data: attachment.data } });
-            
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:streamGenerateContent?alt=sse&key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: parts }] })
-                });
+const sites = {
+  "fnae":         { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae",             desc: "A horror experience based on the infamous Five Nights series." },
+  "geometrydash": { name: "Geometry Dash Lite",         enabled: true,  src: "geometry-dash",    desc: "Jump and fly your way through danger in this rhythm-based action platformer." },
+  "minecraft":    { name: "Minecraft v1.12.2",          enabled: true,  src: "minecraft",        desc: "Build, explore, and survive in an infinite world of blocks." },
+  "zombies":      { name: "CoD Zombies",                enabled: true,  src: "nz-zombies",       desc: "Survive wave after wave of the undead in this Call of Duty classic." },
+  "sm64":         { name: "Super Mario 64",             enabled: true,  src: "sm64",             desc: "The legendary Nintendo 64 platformer, now in your browser." },
+  "potato":       { name: "Throw a Potato",             enabled: true,  src: "throw-a-potato",   desc: "Exactly what it sounds like. Throw potatoes. Have fun." },
+  "snowrider":    { name: "Snow Rider 3D",              enabled: true,  src: "snow-rider3d",     desc: "Race down snowy slopes in this addictive 3D skiing game." },
+  "retrobowl":    { name: "Retro Bowl",                 enabled: true,  src: "retro-bowl",       desc: "Run your own football team in this retro-style sports game." },
+  "wrestlebros":  { name: "Wrestle Bros",               enabled: false, src: "wrestle-bros",     desc: "2-player wrestling fun. Currently offline." },
+  "buckshot":     { name: "Buckshot Roulette",          enabled: true,  src: "buckshot-roulette",desc: "A dark, intense take on Russian roulette with a shotgun." },
+  "drifthunters": { name: "Drift Hunters",              enabled: true,  src: "drift-hunters",    desc: "Earn cash by drifting and upgrade your car to the max." },
+  "basketball":   { name: "Basketball Legends 2020",    enabled: false, src: "basketball-legends",desc: "Play as legendary basketball stars. Currently offline." },
+  "cheddarclicker":{ name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker",  desc: "An idle clicker game about cheese. Yes, cheese." },
+  "bloonstd4":    { name: "Bloons Tower Defense 4",     enabled: true,  src: "bloons-td4",       desc: "Pop bloons and defend your territory in this classic tower defense game." },
+};
 
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let fullText = "";
+const tools = {
+  "ide":         { name: "CheddarOS IDE",       enabled: true,  src: "cheddar-ide"  },
+  "formcracker": { name: "Google Form Cracker", enabled: true,  src: "form-cracker" },
+  "gpt":         { name: "CheddarGPT",          enabled: true,  src: "gpt"          },
+};
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split("\n");
-                    for (const line of lines) {
-                        if (line.startsWith("data: ")) {
-                            try {
-                                const data = JSON.parse(line.substring(6));
-                                if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                                    fullText += data.candidates[0].content.parts[0].text;
-                                    botMsgDiv.innerHTML = marked.parse(fullText);
-                                    botMsgDiv.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
-                                    scrollToBottom();
-                                }
-                            } catch(e) {}
-                        }
-                    }
-                }
-            } catch (err) {
-                botMsgDiv.innerHTML = `<span style="color: #ff6b6b;">Connection Error: ${err.message}</span>`;
-            }
-        }
+const changelogData = [
+  { ver: "vBETA-1.0.0a", date: "3/99/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
+  { ver: "vALPHA-2.1.3", date: "3/14/2026", items: ["Fixed Bloons TD4"] },
+  { ver: "vALPHA-2.1.2", date: "3/13/2026", items: ["Added Bloons TD4","Fixed formatting","Minor bug fixes"] },
+  { ver: "vALPHA-2.1.1", date: "3/11/2026", items: ["Added Basketball Legends","Basketball Legends offline while looking for GoGuardian bypass"] },
+  { ver: "vALPHA-2.1.0", date: "3/9/2026",  items: ["Completely changed how games load","Games load faster than ever","Reduced lag in every game and inside CheddarOS","Fixed GoGuardian bypass for Buckshot Roulette","Shell Shockers removed"] },
+  { ver: "vALPHA-2.0.3", date: "3/8/2026",  items: ["Added Drift Hunters"] },
+  { ver: "vALPHA-2.0.2", date: "3/7/2026",  items: ["Added an info command to see more information about CheddarOS"] },
+  { ver: "vALPHA-2.0.1", date: "3/7/2026",  items: ["Formatted the games and the help list to look more professional","Added an announcement text","Minor bug fixes"] },
+  { ver: "vALPHA-2.0.0", date: "3/4/2026",  items: ["Completely revamped the UI","Changed tab name and icon"] },
+  { ver: "vALPHA-1.1.0", date: "2/27/2026", items: ["Massive Code Cleanup"] },
+  { ver: "vALPHA-1.0.10",date: "2/27/2026", items: ["Added Buckshot Roulette"] },
+  { ver: "vALPHA-1.0.9", date: "2/27/2026", items: ["Added Wrestle Bros"] },
+  { ver: "vALPHA-1.0.8", date: "2/27/2026", items: ["Formatted the credits screen"] },
+  { ver: "vALPHA-1.0.7", date: "2/26/2026", items: ["Added Shell Shockers"] },
+  { ver: "vALPHA-1.0.6", date: "2/26/2026", items: ["Added Retro Bowl"] },
+  { ver: "vALPHA-1.0.5b",date: "2/26/2026", items: ["Minor bug fixes","Cut the loading speed in half"] },
+  { ver: "vALPHA-1.0.5", date: "2/25/2026", items: ["Throw a Potato fixed","Removed ads","FNaE revamp","Fixed Snow Rider 3D black screen"] },
+  { ver: "vALPHA-1.0.4", date: "2/25/2026", items: ["FNaE back online"] },
+  { ver: "vALPHA-1.0.3", date: "2/25/2026", items: ["FNaE taken offline","Throw a Potato offline (GoGuardian)"] },
+  { ver: "vALPHA-1.0.2", date: "2/23/2026", items: ["Minor fixes","Throw a Potato playable","Added Snow Rider 3D (WIP)"] },
+  { ver: "vALPHA-1.0.1", date: "2/23/2026", items: ["Throw a Potato maintenance"] },
+  { ver: "vALPHA-1.0.0", date: "2/23/2026", items: ["CheddarOS early private access release."] },
+];
 
-async function simulateStreaming(content, element) {
-    let currentText = "";
-    for (let i = 0; i < content.length; i++) {
-        currentText += content[i];
-        // This ensures the markdown is re-parsed every character
-        element.innerHTML = marked.parse(currentText); 
-        
-        // Highlight code if any exists in your debug string
-        element.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
-        
-        scrollToBottom();
-        await new Promise(r => setTimeout(r, 30)); // Slightly slower (30ms) is better for testing
-    }
+const creditsData = [
+  { role: "LEAD PROGRAMMER", people: ["Matt Hauber (Cheddar Hobbs)"] },
+  { role: "CONTRIBUTORS",    people: ["Matt Marakovits","Joey Lombardo (Joronster)","Alex Falana"] },
+  { role: "TESTERS",         people: ["Jadell Vargas (Jelly)","Vinny Nucci (Vinchenzo)","Max Dankies","Tyler Hartman"] },
+];
+const creditsDisclaimer = "All Testers and Contributors are not affiliated in any way with the development of CheddarOS.";
+
+// ── BUILD SIDEBAR ──
+function buildSidebar() {
+  const gEl = document.getElementById("games-sidebar");
+  const oEl = document.getElementById("offline-sidebar");
+  const tEl = document.getElementById("tools-sidebar");
+
+  Object.entries(sites).sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, s]) => {
+    const btn = document.createElement("button");
+    btn.className = "sidebar-item" + (!s.enabled ? " offline" : "");
+    btn.textContent = key;
+    btn.dataset.key = key;
+    btn.onclick = () => showGame(key);
+    (s.enabled ? gEl : oEl).appendChild(btn);
+  });
+
+  Object.entries(tools).sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, t]) => {
+    const btn = document.createElement("button");
+    btn.className = "sidebar-item" + (!t.enabled ? " offline" : "");
+    btn.textContent = key;
+    btn.dataset.key = key;
+    btn.onclick = () => showTool(key);
+    tEl.appendChild(btn);
+  });
 }
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                currentAttachment = { 
-                    mime_type: file.type, 
-                    data: e.target.result.split(',')[1], 
-                    src: e.target.result, 
-                    isImage: file.type.startsWith('image/') 
-                };
-                previewArea.innerHTML = `<div style="padding:10px; color:var(--accent-blue)">📎 ${file.name} attached</div>`;
-                previewArea.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
+// ── BUILD POPULAR GRID ──
+function buildPopularGrid() {
+  const popularKeys = ["zombies","geometrydash","buckshot","drifthunters"];
+  const grid = document.getElementById("popular-grid");
+  popularKeys.forEach(key => {
+    const s = sites[key];
+    const card = document.createElement("div");
+    card.className = "popular-card";
+    card.innerHTML = `
+      <div class="card-img">
+        <img src="${gameDirectory}/${s.src}/icon.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <div class="no-img" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;flex-direction:column;">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="2" y="6" width="36" height="28" rx="2" stroke="#555" stroke-width="2"/><circle cx="14" cy="16" r="4" stroke="#555" stroke-width="2"/><path d="M2 30 L14 18 L22 26 L28 20 L38 30" stroke="#555" stroke-width="2"/></svg>
+          <span style="font-size:10px;color:#555;margin-top:4px">No image</span>
+        </div>
+      </div>
+      <div class="card-label">${s.name}</div>
+    `;
+    card.onclick = () => showGame(key);
+    grid.appendChild(card);
+  });
+}
 
-        function clearAttachment() {
-            previewArea.style.display = 'none';
-            currentAttachment = null;
-        }
+// ── BUILD CHANGELOGS ──
+function buildChangelogs() {
+  const el = document.getElementById("changelog-list");
+  changelogData.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "cl-entry";
+    div.innerHTML = `
+      <span class="cl-ver">${entry.ver}</span><span class="cl-date">${entry.date}</span>
+      <ul class="cl-items">${entry.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    `;
+    el.appendChild(div);
+  });
+}
 
-        function createMessageElement(text, type) {
-            const wrapper = document.createElement('div');
-            wrapper.className = `msg-wrapper ${type}`;
-            const displayContent = type === 'user' ? text : marked.parse(text);
-            wrapper.innerHTML = `<div class="msg"><div>${displayContent}</div></div>`;
-            chatDisplay.appendChild(wrapper);
-            scrollToBottom();
-            return wrapper.querySelector('.msg div');
-        }
+// ── BUILD HOME PREVIEW ──
+function buildHomePreview() {
+  const el = document.getElementById("home-changelog-preview");
+  const recent = changelogData.slice(0, 3);
+  recent.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "changelog-entry";
+    div.innerHTML = `
+      <span class="entry-ver">${entry.ver}</span><span class="entry-date">${entry.date}</span>
+      <ul>${entry.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    `;
+    el.appendChild(div);
+  });
+}
 
-        function scrollToBottom() {
-            const container = document.getElementById('chat-container');
-            container.scrollTop = container.scrollHeight;
-        }
+// ── BUILD CREDITS ──
+function buildCredits() {
+  const el = document.getElementById("credits-content");
+  creditsData.forEach(section => {
+    const div = document.createElement("div");
+    div.className = "credits-section";
+    div.innerHTML = `
+      <div class="credits-role">${section.role}</div>
+      <ul class="credits-people">${section.people.map(p=>`<li>${p}</li>`).join('')}</ul>
+    `;
+    el.appendChild(div);
+  });
+  const disc = document.createElement("div");
+  disc.className = "credits-disclaimer";
+  disc.textContent = creditsDisclaimer;
+  el.appendChild(disc);
+}
 
-        promptInput.addEventListener('keydown', (e) => { 
-            if (e.key === 'Enter' && !e.shiftKey) { 
-                e.preventDefault(); 
-                handleSend(); 
-            } 
-        });
+// ── NAV TABS ──
+let currentTab = "home";
+let currentSidebarKey = null;
 
-        promptInput.addEventListener('input', function() { 
-            this.style.height = 'auto'; 
-            this.style.height = (this.scrollHeight) + 'px'; 
-        });
-    </script>
+function showTab(tab) {
+  currentTab = tab;
+  currentSidebarKey = null;
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("game-page").classList.remove("active");
+  document.getElementById("tool-page").classList.remove("active");
+  document.getElementById(`page-${tab}`)?.classList.add("active");
+  document.querySelectorAll(".sidebar-item").forEach(b => b.classList.remove("active"));
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.onclick = () => showTab(btn.dataset.tab);
+});
+
+// ── SHOW GAME ──
+function showGame(key) {
+  const s = sites[key];
+  currentSidebarKey = key;
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("tool-page").classList.remove("active");
+  document.getElementById("game-page").classList.add("active");
+  document.querySelectorAll(".sidebar-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+
+  // banner
+  const bannerEl = document.getElementById("game-banner");
+  bannerEl.innerHTML = `
+    <img src="${gameDirectory}/${s.src}/banner.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+    <div class="no-banner" style="display:none">No image</div>
+  `;
+
+  document.getElementById("game-name-bar").textContent = s.name;
+
+  const descArea = document.getElementById("game-desc-area");
+  if (!s.enabled) {
+    descArea.innerHTML = `<div class="game-offline-notice">
+      '${s.name}' is not currently available.<br>
+      This game has been taken offline because of an error. Please check back next update.
+    </div>`;
+    document.getElementById("game-play-btn").disabled = true;
+    document.getElementById("game-play-btn").style.opacity = "0.4";
+  } else {
+    descArea.innerHTML = `<div class="game-desc-box">${s.desc}</div>`;
+    document.getElementById("game-play-btn").disabled = false;
+    document.getElementById("game-play-btn").style.opacity = "1";
+  }
+
+  document.getElementById("game-play-btn").onclick = s.enabled ? () => launchGame(key) : null;
+}
+
+// ── SHOW TOOL ──
+function showTool(key) {
+  const t = tools[key];
+  currentSidebarKey = key;
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("game-page").classList.remove("active");
+  document.getElementById("tool-page").classList.add("active");
+  document.querySelectorAll(".sidebar-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+
+  document.getElementById("tool-header").textContent = t.name;
+  const wrap = document.querySelector(".tool-frame-wrap");
+  wrap.innerHTML = `<div class="tool-placeholder">Loading ${t.name}...</div>`;
+
+  if (!t.enabled) {
+    wrap.innerHTML = `<div class="tool-placeholder" style="color:#cc3333">${t.name} is currently disabled.</div>`;
+    return;
+  }
+
+  fetch(`${toolDirectory}/${t.src}/index.html`)
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+    .then(html => {
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const frame = document.createElement("iframe");
+      frame.style.cssText = "width:100%;height:100%;border:none;background:#1a1a1a;";
+      frame.src = url;
+      wrap.innerHTML = "";
+      wrap.appendChild(frame);
+    })
+    .catch(err => {
+      wrap.innerHTML = `<div class="tool-placeholder" style="color:#cc3333">Error loading tool: ${err.message}</div>`;
+    });
+}
+
+function launchGame(key) {
+  const s = sites[key];
+  fetch(`${gameDirectory}/${s.src}/index.html`)
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+    .then(html => {
+      const blob = new Blob([html], { type: 'text/html' });
+      const blobURL = URL.createObjectURL(blob);
+      const frame = document.createElement("iframe");
+      frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;";
+      frame.src = blobURL;
+      document.body.appendChild(frame);
+
+      const closeBtn = document.createElement("div");
+      closeBtn.innerText = "✕";
+      closeBtn.style.cssText = `position:fixed;top:10px;right:10px;z-index:10000;background:#960019;color:#fff;font-family:monospace;font-size:11px;font-weight:bold;padding:5px 10px;cursor:pointer;border:2px solid #fff;box-shadow:2px 2px 0 #000;user-select:none;opacity:1;transition:opacity 1.5s;`;
+      closeBtn.onmouseenter = () => closeBtn.style.opacity = "1";
+      closeBtn.onmouseleave = () => closeBtn.style.opacity = "0.15";
+      setTimeout(() => closeBtn.style.opacity = "0.15", 2000);
+      closeBtn.onclick = () => { frame.remove(); closeBtn.remove(); URL.revokeObjectURL(blobURL); };
+      document.body.appendChild(closeBtn);
+    })
+    .catch(err => alert(`Failed to load '${s.name}': ${err.message}`));
+}
+
+// ── GITHUB STATS ──
+async function fetchGitHubStats() {
+  try {
+    const res = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits/main');
+    const data = await res.json();
+    const fmt = new Intl.DateTimeFormat('en-US', { year:'numeric', month:'2-digit', day:'2-digit', hour:'numeric', minute:'2-digit', hour12:true, timeZone:'America/New_York', timeZoneName:'short' });
+    document.getElementById("ic-updated").textContent = fmt.format(new Date(data.commit.committer.date)).replace(',',' ');
+  } catch { document.getElementById("ic-updated").textContent = "Unavailable"; }
+
+  try {
+    const res = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=100');
+    const commits = await res.json();
+    document.getElementById("ic-commits").textContent = Array.isArray(commits) ? commits.length : "Not found";
+  } catch { document.getElementById("ic-commits").textContent = "Unavailable"; }
+}
+
+buildSidebar();
+buildPopularGrid();
+buildChangelogs();
+buildHomePreview();
+buildCredits();
+fetchGitHubStats();
+</script>
 </body>
 </html>
