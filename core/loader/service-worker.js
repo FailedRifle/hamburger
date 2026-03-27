@@ -1,13 +1,16 @@
 const CACHE_NAME = "vBETA-1.0.0";
 const ASSETS = [
-  "/hamburger/core/loader/",
-  "/hamburger/core/loader/index.html",
-  "/hamburger/core/loader/manifest.json"
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./blocked.png"
 ];
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(ASSETS);
+    })
   );
   self.skipWaiting();
 });
