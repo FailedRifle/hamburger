@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="//fonts.googleapis.com/css?family=Roboto:400,100,700,900" rel="stylesheet" type="text/css">
-  <link href="/hamburger/core/loader/blocked.png" rel="icon" type="image/png">
+  
+  <link href="blocked.png" rel="icon" type="image/png">
+  
   <meta name="theme-color" content="#000000">
   <style>
     @supports (font: -apple-system-body) { html { font: -apple-system-body; } }
@@ -18,7 +20,8 @@
       color: #c7c7c7; text-align: center; font-size: 1.72em; font-weight: 100;
       height: 22em; background-repeat: no-repeat; background-size: 32%;
       background-position: center center;
-      background-image: url('/hamburger/core/loader/blocked.png');
+      /* Updated: Relative path for the background image */
+      background-image: url('blocked.png');
     }
     .content h1 { color: #00AAD7; font-size: 2.5em; margin: 0; margin-bottom: -20px; }
     iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: none; display: none; }
@@ -48,14 +51,16 @@
     if (ALLOW_INSTALL) {
       const link = document.createElement('link');
       link.rel = 'manifest';
-      link.href = '/hamburger/core/loader/manifest.json';
+      // Updated: Relative path (same folder)
+      link.href = 'manifest.json';
       document.head.appendChild(link);
     }
 
     if (isPWA) {
       document.title = 'created by mhauber';
       const frame = document.getElementById('app-frame');
-      frame.src = '/hamburger/core/library/index.html';
+      // Updated: ../ moves up to "core", then into "library"
+      frame.src = '../library/index.html';
       frame.style.display = 'block';
     } else {
       document.title = 'RESTRICTED!';
@@ -67,7 +72,8 @@
     }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hamburger/core/service-worker.js')
+      // Updated: ./ tells the browser to look in the current folder
+      navigator.serviceWorker.register('./service-worker.js')
         .then(reg => console.log('SW registered:', reg.scope))
         .catch(err => console.error('SW failed:', err));
     }
