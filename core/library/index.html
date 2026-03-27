@@ -58,10 +58,8 @@
     height: 2px; background: var(--accent);
   }
 
-  /* ── BODY ── */
   #body { display: flex; flex: 1; overflow: hidden; }
 
-  /* ── SIDEBAR ── */
   #sidebar {
     width: var(--sidebar-w); min-width: var(--sidebar-w);
     background: var(--sidebar-bg);
@@ -89,7 +87,6 @@
   .sidebar-item.offline { color: var(--red); }
   .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
 
-  /* ── MAIN CONTENT ── */
   #main { flex: 1; overflow-y: auto; background: var(--bg); }
   #main::-webkit-scrollbar { width: 6px; }
   #main::-webkit-scrollbar-thumb { background: var(--border); }
@@ -97,7 +94,6 @@
   .page { display: none; padding: 28px 32px; }
   .page.active { display: block; }
 
-  /* ── HOME PAGE ── */
   .home-whats-new { margin-bottom: 32px; }
   .home-whats-new h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
   .home-whats-new .ver-tag { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
@@ -135,7 +131,6 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
-  /* ── INFO PAGE ── */
   .info-title {
     background: var(--panel-bg); border: 1px solid var(--border);
     display: inline-block; padding: 10px 24px; margin-bottom: 24px; border-radius: 2px;
@@ -150,7 +145,6 @@
   .info-card .ic-label { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
   .info-card .ic-value { font-size: 13px; color: var(--text-dim); }
 
-  /* ── CHANGELOGS PAGE ── */
   .changelog-list { }
   .cl-entry {
     border-bottom: 1px solid var(--border); padding: 14px 0;
@@ -161,7 +155,6 @@
   .cl-items { margin-top: 6px; padding-left: 16px; }
   .cl-items li { font-size: 13px; color: var(--text-dim); line-height: 1.75; }
 
-  /* ── CREDITS PAGE ── */
   .credits-section { margin-bottom: 28px; }
   .credits-role {
     background: var(--panel-bg); border: 1px solid var(--border);
@@ -175,7 +168,6 @@
     font-size: 12px; color: var(--text-muted); font-style: italic;
   }
 
-  /* ── GAME PAGE ── */
   #game-page { display: none; padding: 0; flex-direction: column; }
   #game-page.active { display: flex; }
   .game-banner {
@@ -213,8 +205,12 @@
     border-radius: 4px; font-size: 14px; color: var(--red);
   }
 
-  /* ── TOOL PAGE ── */
-  #tool-page { display: none; padding: 0; flex-direction: column; }
+ #tool-page { 
+    display: none; 
+    padding: 0; 
+    flex-direction: column; 
+    height: 100%;
+ }
   #tool-page.active { display: flex; }
   .tool-header {
     padding: 16px 24px; border-bottom: 1px solid var(--border);
@@ -224,7 +220,6 @@
   .tool-frame-wrap { flex: 1; background: var(--card-bg); display: flex; align-items: center; justify-content: center; }
   .tool-placeholder { font-size: 14px; color: var(--text-muted); }
 
-  /* notice bar */
   #notice-bar {
     background: #2a0000; border-bottom: 1px solid var(--red);
     padding: 6px 32px; font-size: 12px; color: var(--red); font-weight: 600;
@@ -235,7 +230,6 @@
 <body>
 <div id="app">
 
-  <!-- HEADER -->
   <div id="header">
     <div id="logo">
       <h1>CheddarOS <span class="ver" id="logo-ver"></span></h1>
@@ -249,13 +243,10 @@
     </nav>
   </div>
 
-  <!-- NOTICE BAR -->
   <div id="notice-bar" style="display:none"></div>
 
-  <!-- BODY -->
   <div id="body">
 
-    <!-- SIDEBAR -->
     <div id="sidebar">
       <div class="sidebar-section">
         <div class="sidebar-header">- ALL GAMES</div>
@@ -273,10 +264,8 @@
       </div>
     </div>
 
-    <!-- MAIN -->
     <div id="main">
 
-      <!-- HOME -->
       <div class="page active" id="page-home">
         <div class="home-whats-new">
           <h2>What's new?</h2>
@@ -289,7 +278,6 @@
         </div>
       </div>
 
-      <!-- INFO -->
       <div class="page" id="page-info">
         <div class="info-title">
           <h2>CheddarOS Information</h2>
@@ -311,17 +299,14 @@
         </div>
       </div>
 
-      <!-- CHANGELOGS -->
       <div class="page" id="page-changelogs">
         <div class="changelog-list" id="changelog-list"></div>
       </div>
 
-      <!-- CREDITS -->
       <div class="page" id="page-credits">
         <div id="credits-content"></div>
       </div>
 
-      <!-- GAME PAGE -->
       <div id="game-page">
         <div class="game-banner" id="game-banner">
           <div class="no-banner">No image</div>
@@ -333,7 +318,6 @@
         <div id="game-desc-area"></div>
       </div>
 
-      <!-- TOOL PAGE -->
       <div id="tool-page">
         <div class="tool-header" id="tool-header">Tool name</div>
         <div class="tool-frame-wrap">
@@ -346,7 +330,7 @@
 </div>
 
 <script>
-const OS_VERSION = "vBETA-1.0.0a";
+const OS_VERSION = "vBETA-1.0.0";
 document.getElementById("logo-ver").textContent = OS_VERSION;
 document.getElementById("home-ver").textContent = OS_VERSION;
 document.getElementById("info-ver").textContent = OS_VERSION;
@@ -359,34 +343,37 @@ if (ANNOUNCEMENT_TEXT.trim()) {
   nb.textContent = "[NOTICE] " + ANNOUNCEMENT_TEXT;
 }
 
-const gameDirectory = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/games";
-const toolDirectory = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/core/library/tools";
+let LATEST_SHA = "main";
+const REPO_BASE = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger";
+
+function getGameDir() { return `${REPO_BASE}@${LATEST_SHA}/games`; }
+function getToolDir() { return `${REPO_BASE}@${LATEST_SHA}/core/library/tools`; }
 
 const sites = {
-  "fnae":         { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae",             desc: "A horror experience based on the infamous Five Nights series." },
+  "fnae":         { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae",             desc: "Dont get molested." },
   "geometrydash": { name: "Geometry Dash Lite",         enabled: true,  src: "geometry-dash",    desc: "Jump and fly your way through danger in this rhythm-based action platformer." },
-  "minecraft":    { name: "Minecraft v1.12.2",          enabled: true,  src: "minecraft",        desc: "Build, explore, and survive in an infinite world of blocks." },
-  "zombies":      { name: "CoD Zombies",                enabled: true,  src: "nz-zombies",       desc: "Survive wave after wave of the undead in this Call of Duty classic." },
+  "minecraft":    { name: "Minecraft v1.12.2",          enabled: true,  src: "minecraft",        desc: "Build, explore, and do what ever you want." },
+  "zombies":      { name: "CoD Zombies",                enabled: true,  src: "nz-zombies",       desc: "Survive wave after wave of the nazi zombies." },
   "sm64":         { name: "Super Mario 64",             enabled: true,  src: "sm64",             desc: "The legendary Nintendo 64 platformer, now in your browser." },
-  "potato":       { name: "Throw a Potato",             enabled: true,  src: "throw-a-potato",   desc: "Exactly what it sounds like. Throw potatoes. Have fun." },
+  "potato":       { name: "Throw a Potato",             enabled: true,  src: "throw-a-potato",   desc: "Exactly what it sounds like. Throw potatoes." },
   "snowrider":    { name: "Snow Rider 3D",              enabled: true,  src: "snow-rider3d",     desc: "Race down snowy slopes in this addictive 3D skiing game." },
   "retrobowl":    { name: "Retro Bowl",                 enabled: true,  src: "retro-bowl",       desc: "Run your own football team in this retro-style sports game." },
   "wrestlebros":  { name: "Wrestle Bros",               enabled: false, src: "wrestle-bros",     desc: "2-player wrestling fun. Currently offline." },
   "buckshot":     { name: "Buckshot Roulette",          enabled: true,  src: "buckshot-roulette",desc: "A dark, intense take on Russian roulette with a shotgun." },
   "drifthunters": { name: "Drift Hunters",              enabled: true,  src: "drift-hunters",    desc: "Earn cash by drifting and upgrade your car to the max." },
-  "basketball":   { name: "Basketball Legends 2020",    enabled: false, src: "basketball-legends",desc: "Play as legendary basketball stars. Currently offline." },
-  "cheddarclicker":{ name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker",  desc: "An idle clicker game about cheese. Yes, cheese." },
+  "basketball":   { name: "Basketball Legends 2020",    enabled: false, src: "basketball-legends",desc: "Play as legendary basketball stars." },
+  "cheddarclicker":{ name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker",  desc: "VINNYYY!!! NUCCHHIII!!" },
   "bloonstd4":    { name: "Bloons Tower Defense 4",     enabled: true,  src: "bloons-td4",       desc: "Pop bloons and defend your territory in this classic tower defense game." },
 };
 
 const tools = {
-  "ide":         { name: "CheddarOS IDE",       enabled: true,  src: "cheddar-ide"  },
-  "formcracker": { name: "Google Form Cracker", enabled: true,  src: "form-cracker" },
-  "gpt":         { name: "CheddarGPT",          enabled: true,  src: "gpt"          },
+  "html ide": { name: "CheddarOS IDE", enabled: true, src: "cheddar-ide"},
+  "formcracker": { name: "Google Form Cracker", enabled: true, src: "form-cracker"},
+  "gpt": { name: "CheddarGPT", enabled: true,  src: "gpt"},
 };
 
 const changelogData = [
-  { ver: "vBETA-1.0.0a", date: "3/99/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
+  { ver: "vBETA-1.0.0", date: "3/30/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
   { ver: "vALPHA-2.1.3", date: "3/14/2026", items: ["Fixed Bloons TD4"] },
   { ver: "vALPHA-2.1.2", date: "3/13/2026", items: ["Added Bloons TD4","Fixed formatting","Minor bug fixes"] },
   { ver: "vALPHA-2.1.1", date: "3/11/2026", items: ["Added Basketball Legends","Basketball Legends offline while looking for GoGuardian bypass"] },
@@ -417,7 +404,6 @@ const creditsData = [
 ];
 const creditsDisclaimer = "All Testers and Contributors are not affiliated in any way with the development of CheddarOS.";
 
-// ── BUILD SIDEBAR ──
 function buildSidebar() {
   const gEl = document.getElementById("games-sidebar");
   const oEl = document.getElementById("offline-sidebar");
@@ -442,7 +428,6 @@ function buildSidebar() {
   });
 }
 
-// ── BUILD POPULAR GRID ──
 function buildPopularGrid() {
   const popularKeys = ["zombies","geometrydash","buckshot","drifthunters"];
   const grid = document.getElementById("popular-grid");
@@ -452,7 +437,7 @@ function buildPopularGrid() {
     card.className = "popular-card";
     card.innerHTML = `
       <div class="card-img">
-        <img src="${gameDirectory}/${s.src}/icon.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <img src="${getGameDir()}/${s.src}/icon.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
         <div class="no-img" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;flex-direction:column;">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="2" y="6" width="36" height="28" rx="2" stroke="#555" stroke-width="2"/><circle cx="14" cy="16" r="4" stroke="#555" stroke-width="2"/><path d="M2 30 L14 18 L22 26 L28 20 L38 30" stroke="#555" stroke-width="2"/></svg>
           <span style="font-size:10px;color:#555;margin-top:4px">No image</span>
@@ -465,7 +450,6 @@ function buildPopularGrid() {
   });
 }
 
-// ── BUILD CHANGELOGS ──
 function buildChangelogs() {
   const el = document.getElementById("changelog-list");
   changelogData.forEach(entry => {
@@ -479,10 +463,12 @@ function buildChangelogs() {
   });
 }
 
-// ── BUILD HOME PREVIEW ──
 function buildHomePreview() {
   const el = document.getElementById("home-changelog-preview");
-  const recent = changelogData.slice(0, 3);
+  
+  const recent = changelogData.slice(0, 1); 
+  
+  el.innerHTML = "";
   recent.forEach(entry => {
     const div = document.createElement("div");
     div.className = "changelog-entry";
@@ -494,7 +480,6 @@ function buildHomePreview() {
   });
 }
 
-// ── BUILD CREDITS ──
 function buildCredits() {
   const el = document.getElementById("credits-content");
   creditsData.forEach(section => {
@@ -512,7 +497,6 @@ function buildCredits() {
   el.appendChild(disc);
 }
 
-// ── NAV TABS ──
 let currentTab = "home";
 let currentSidebarKey = null;
 
@@ -531,7 +515,6 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
   btn.onclick = () => showTab(btn.dataset.tab);
 });
 
-// ── SHOW GAME ──
 function showGame(key) {
   const s = sites[key];
   currentSidebarKey = key;
@@ -541,10 +524,9 @@ function showGame(key) {
   document.getElementById("game-page").classList.add("active");
   document.querySelectorAll(".sidebar-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
 
-  // banner
   const bannerEl = document.getElementById("game-banner");
   bannerEl.innerHTML = `
-    <img src="${gameDirectory}/${s.src}/banner.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+    <img src="${getGameDir()}/${s.src}/banner.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
     <div class="no-banner" style="display:none">No image</div>
   `;
 
@@ -567,7 +549,6 @@ function showGame(key) {
   document.getElementById("game-play-btn").onclick = s.enabled ? () => launchGame(key) : null;
 }
 
-// ── SHOW TOOL ──
 function showTool(key) {
   const t = tools[key];
   currentSidebarKey = key;
@@ -586,11 +567,15 @@ function showTool(key) {
     return;
   }
 
-  fetch(`${toolDirectory}/${t.src}/index.html`)
+  const toolBase = `${getToolDir()}/${t.src}/`;
+  
+  fetch(`${toolBase}index.html`)
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
     .then(html => {
-      const blob = new Blob([html], { type: 'text/html' });
+      const processedHtml = `<head><base href="${toolBase}"></head>` + html;
+      const blob = new Blob([processedHtml], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
+      
       const frame = document.createElement("iframe");
       frame.style.cssText = "width:100%;height:100%;border:none;background:#1a1a1a;";
       frame.src = url;
@@ -604,42 +589,69 @@ function showTool(key) {
 
 function launchGame(key) {
   const s = sites[key];
-  fetch(`${gameDirectory}/${s.src}/index.html`)
+  const gameBase = `${getGameDir()}/${s.src}/`;
+
+  fetch(`${gameBase}index.html`)
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
     .then(html => {
-      const blob = new Blob([html], { type: 'text/html' });
+      const processedHtml = `<head><base href="${gameBase}"></head>` + html;
+      const blob = new Blob([processedHtml], { type: 'text/html' });
       const blobURL = URL.createObjectURL(blob);
+      
       const frame = document.createElement("iframe");
-      frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;";
+      frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;background:#000;";
       frame.src = blobURL;
       document.body.appendChild(frame);
 
       const closeBtn = document.createElement("div");
       closeBtn.innerText = "✕";
       closeBtn.style.cssText = `position:fixed;top:10px;right:10px;z-index:10000;background:#960019;color:#fff;font-family:monospace;font-size:11px;font-weight:bold;padding:5px 10px;cursor:pointer;border:2px solid #fff;box-shadow:2px 2px 0 #000;user-select:none;opacity:1;transition:opacity 1.5s;`;
+      
       closeBtn.onmouseenter = () => closeBtn.style.opacity = "1";
       closeBtn.onmouseleave = () => closeBtn.style.opacity = "0.15";
       setTimeout(() => closeBtn.style.opacity = "0.15", 2000);
-      closeBtn.onclick = () => { frame.remove(); closeBtn.remove(); URL.revokeObjectURL(blobURL); };
+      
+      closeBtn.onclick = () => { 
+        frame.remove(); 
+        closeBtn.remove(); 
+        URL.revokeObjectURL(blobURL); 
+      };
       document.body.appendChild(closeBtn);
     })
     .catch(err => alert(`Failed to load '${s.name}': ${err.message}`));
 }
 
-// ── GITHUB STATS ──
 async function fetchGitHubStats() {
   try {
     const res = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits/main');
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    const fmt = new Intl.DateTimeFormat('en-US', { year:'numeric', month:'2-digit', day:'2-digit', hour:'numeric', minute:'2-digit', hour12:true, timeZone:'America/New_York', timeZoneName:'short' });
-    document.getElementById("ic-updated").textContent = fmt.format(new Date(data.commit.committer.date)).replace(',',' ');
-  } catch { document.getElementById("ic-updated").textContent = "Unavailable"; }
+    
+    LATEST_SHA = data.sha;
+    console.log("CheddarOS: Running on commit " + LATEST_SHA);
 
-  try {
-    const res = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=100');
-    const commits = await res.json();
+    const fmt = new Intl.DateTimeFormat('en-US', { 
+      year:'numeric', month:'2-digit', day:'2-digit', 
+      hour:'numeric', minute:'2-digit', hour12:true, 
+      timeZone:'America/New_York', timeZoneName:'short' 
+    });
+    document.getElementById("ic-updated").textContent = fmt.format(new Date(data.commit.committer.date)).replace(',',' ');
+
+    const resCount = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=100');
+    const commits = await resCount.json();
     document.getElementById("ic-commits").textContent = Array.isArray(commits) ? commits.length : "Not found";
-  } catch { document.getElementById("ic-commits").textContent = "Unavailable"; }
+
+    const grid = document.getElementById("popular-grid");
+    if (grid) {
+      grid.innerHTML = "";
+      buildPopularGrid();
+    }
+
+  } catch (err) { 
+    console.warn("CheddarOS: GitHub API limit reached or offline. Falling back to @main.");
+    document.getElementById("ic-updated").textContent = "Unavailable"; 
+    document.getElementById("ic-commits").textContent = "Unavailable";
+  }
 }
 
 buildSidebar();
