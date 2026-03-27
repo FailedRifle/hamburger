@@ -2,7 +2,7 @@ const CACHE_NAME = "vBETA-1.0.0";
 const ASSETS = [
   "/hamburger/core/loader/",
   "/hamburger/core/loader/index.html",
-  "/hamburger/core/scripts/manifest.json"
+  "/hamburger/core/loader/manifest.json"
 ];
 
 self.addEventListener("install", event => {
