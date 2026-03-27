@@ -67,7 +67,7 @@
     </div>
 </div>
 <script>
-    const OS_VERSION = "vBETA-1.0.0b";
+    const OS_VERSION = "vBETA-1.0.0c";
     document.getElementById("ver-line").textContent = `Welcome to CheddarOS ${OS_VERSION}`;
     document.title = `CheddarOS ${OS_VERSION}`;
 
@@ -107,7 +107,8 @@
         `;
     })();
 
-    const CDN = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/games";
+    const gameDirectory = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/games";
+    const toolDirectory = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger@main/core/library/tools";
 
     const sites = {
         "fnae": { name: "Five Nights at Epstein's", enabled: true, src: "fnae"},
@@ -126,6 +127,12 @@
         "bloonstd4": { name: "Bloons Tower Defense 4", enabled: true, src: "bloons-td4"},
     };
 
+    const tools = {
+        "ide": { name: "CheddarOS IDE", enabled: true, src: "cheddar-ide" },
+        "formcracker": { name: "Google Form Cracker", enabled: true, src: "form-cracker" },
+        "gpt": { name: "CheddarGPT", enabled: true, src: "gpt" },
+    };
+
     const commandDetails = {
         "changelog": "View recent system updates.",
         "clear":     "Clear the terminal screen.",
@@ -133,6 +140,7 @@
         "gamelist":  "List all available games.",
         "help":      "Display this help menu.",
         "info":      "View repository and build information.",
+        "toollist":  "List all available system tools.",
     };
 
     const inputField  = document.getElementById("terminalInput");
@@ -172,7 +180,7 @@
 
         let gameHTML;
         try {
-            const res = await fetch(`${CDN}/${sd.src}/index.html`);
+            const res = await fetch(`${gameDirectory}/${sd.src}/index.html`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             gameHTML = await res.text();
         } catch (err) {
@@ -224,6 +232,50 @@
         ob.innerHTML += ln(`${sd.name} launched successfully.`, 'var(--dos-green)');
         isLaunching = false; inputField.disabled = false; inputField.focus(); smartScroll();
     }
+
+    async function launchTool(toolKey) {
+    isLaunching = true;
+    inputField.disabled = true;
+    const td = tools[toolKey];
+    const ob = document.createElement("div");
+    historyArea.appendChild(ob);
+
+    if (!td.enabled) {
+        ob.innerHTML += ln(`'${td.name}' is currently disabled.`, 'var(--dos-red)');
+        isLaunching = false; inputField.disabled = false; inputField.focus(); return;
+    }
+
+    ob.innerHTML += ln(`Initializing ${td.name}...`);
+    smartScroll();
+
+    try {
+        const res = await fetch(`${toolDirectory}/${td.src}/index.html`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const toolHTML = await res.text();
+
+        const blob = new Blob([toolHTML], { type: 'text/html' });
+        const blobURL = URL.createObjectURL(blob);
+        
+        // Using an iframe just like your games
+        const frame = document.createElement('iframe');
+        frame.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;';
+        frame.src = blobURL;
+        document.body.appendChild(frame);
+
+        // UI for the close button
+        const closeBtn = document.createElement('div');
+        closeBtn.innerText = 'EXIT TOOL';
+        closeBtn.style.cssText = `position:fixed;top:10px;right:10px;z-index:10000;background:#0000aa;color:#fff;font-family:monospace;padding:5px 10px;cursor:pointer;border:2px solid #fff;`;
+        closeBtn.onclick = () => { frame.remove(); closeBtn.remove(); URL.revokeObjectURL(blobURL); };
+        document.body.appendChild(closeBtn);
+
+        ob.innerHTML += ln(`${td.name} started.`, 'var(--dos-green)');
+    } catch (err) {
+        ob.innerHTML += ln(`Error loading tool: ${err.message}`, 'var(--dos-red)');
+    }
+
+    isLaunching = false; inputField.disabled = false; inputField.focus(); smartScroll();
+}
 
     inputField.addEventListener('input', () => {
         const val = inputField.value.toLowerCase();
@@ -290,6 +342,24 @@
             ob.innerHTML += `<div class="log-line" style="display:grid;grid-template-columns:160px 1fr;line-height:1.35;"><span>Blocked Counter</span><span>1</span></div>`;
             ob.innerHTML += blank();
         }
+
+else if (userInput === "toollist") {
+    ob.innerHTML += blank();
+    Object.keys(tools).sort().forEach(key => {
+        const col   = tools[key].enabled ? 'var(--dos-gray)' : 'var(--dos-red)';
+        const badge = tools[key].enabled ? '' : ' <span style="color:var(--dos-red)">[OFFLINE]</span>';
+        ob.innerHTML += `<div class="log-line" style="display:grid;grid-template-columns:160px 1fr;color:${col};line-height:1.35;">
+            <span style="color:var(--dos-cyan)">${key}</span>
+            <span>(${tools[key].name})${badge}</span>
+        </div>`;
+    });
+    ob.innerHTML += blank();
+}
+
+else if (tools[userInput]) {
+    ob.remove();
+    launchTool(userInput); // New function created below
+}
         else if (userInput === "credits") {
             ob.innerHTML += blank() + changelog(
                 "--- CREDITS ---$CheddarOS " + OS_VERSION,
