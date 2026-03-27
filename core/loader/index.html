@@ -55,11 +55,24 @@
     }
 
 if (isPWA) {
-  document.title = 'created by mhauber';
-  const frame = document.getElementById('app-frame');
-  frame.src = 'https://cdn.jsdelivr.net/gh/failedrifle/hamburger@main/core/library/index.html';
-  frame.style.display = 'block';
-} else {
+      document.title = 'created by mhauber';
+      const frame = document.getElementById('app-frame');
+      frame.style.display = 'block';
+
+      fetch('https://cdn.jsdelivr.net/gh/failedrifle/hamburger@main/core/library/index.html')
+        .then(response => response.text())
+        .then(html => {
+          const destDoc = frame.contentWindow.document;
+          
+          destDoc.open();
+          destDoc.write(html);
+          destDoc.close();
+        })
+        .catch(err => {
+          console.error('jsDelivr injection failed:', err);
+          frame.src = 'https://failedrifle.github.io/hamburger/core/library/index.html';
+        });
+    } else {
       document.title = 'RESTRICTED!';
       document.getElementById('browser-block').style.display = 'block';
     }
