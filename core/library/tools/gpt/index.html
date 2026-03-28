@@ -20,7 +20,7 @@
 
   nav { display: flex; align-items: center; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0; z-index: 10; }
   .group { display: flex; align-items: center; gap: 12px; }
-  nav span.title { font-weight: 800; font-size: 14px; color: var(--text); }
+  nav span.title { font-weight: 800; font-size: 14px; color: var(--text); letter-spacing: 0.03em; }
   button { background: var(--btn-bg); border: 1px solid var(--btn-border); padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 13px; color: var(--text); outline: none; font-family: system-ui, sans-serif; transition: background 0.1s; }
   button:hover { background: var(--btn-hover); }
 
@@ -79,8 +79,32 @@
   .msg-body pre { margin: 0.75em 0; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; }
   .msg-body pre .code-header { display: flex; align-items: center; justify-content: space-between; background: #2d2f31; padding: 5px 12px; font-size: 11px; font-family: "SFMono-Regular",Consolas,monospace; color: #888; border-bottom: 1px solid var(--border); user-select: none; }
   .msg-body pre .copy-btn { background: transparent; border: 1px solid #555; color: #aaa; font-size: 10px; padding: 1px 7px; border-radius: 3px; cursor: pointer; font-family: system-ui,sans-serif; }
-  .msg-body pre .copy-btn:hover { background: #3a3a3a; color: #fff; }
-  .msg-body pre code { background: transparent !important; border: none; padding: 14px 16px; display: block; font-size: 13px; border-radius: 0; color: inherit; overflow-x: auto; }
+/* 1. Constrain the container */
+  .msg-body pre { 
+    margin: 0.75em 0; 
+    border-radius: 6px; 
+    border: 1px solid var(--border); 
+    overflow: hidden; 
+    max-width: 100%;    /* Ensures it never exceeds the bubble width */
+    display: flex;      /* Helps contain the internal code element */
+    flex-direction: column;
+  }
+
+  /* 2. Force the text to stay inside and wrap */
+  .msg-body pre code { 
+    background: transparent !important; 
+    border: none; 
+    padding: 14px 16px; 
+    display: block; 
+    font-size: 13px; 
+    border-radius: 0; 
+    color: inherit; 
+    
+    white-space: pre-wrap;   /* Key: wraps the long line to the next row */
+    word-break: break-all;  /* Key: breaks long strings if no spaces exist */
+    overflow-x: hidden;     /* Removes the horizontal scrollbar entirely */
+    width: 100%;            /* Forces it to respect the parent's width */
+  }
   .msg-body table { border-collapse: collapse; width: 100%; margin: 0.65em 0; font-size: 13px; }
   .msg-body th,.msg-body td { border: 1px solid var(--border); padding: 6px 12px; text-align: left; }
   .msg-body th { background: #2a2a2a; color: var(--accent); font-weight: 700; }
@@ -130,6 +154,7 @@
 
 <nav>
   <div class="group">
+    <span class="title">CheddarGPT</span>
     <span id="debug-badge" style="display:none; font-size:11px; padding:2px 8px; border-radius:10px; border:1px solid #5a4000; color:#fbbf24; background:#1c1300;">debug mode</span>
   </div>
   <div class="group">
@@ -468,7 +493,6 @@ This is a **debug message** — *no API credits were used*.`;
     busy = false; sendBtn.disabled = false;
   }
 
-  // Run on start
   initSplash();
 </script>
 </body>
