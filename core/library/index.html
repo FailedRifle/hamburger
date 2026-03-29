@@ -330,7 +330,7 @@
 </div>
 
 <script>
-const OS_VERSION = "v1.0.0";
+const OS_VERSION = "v1.0.0a";
 document.getElementById("logo-ver").textContent = OS_VERSION;
 document.getElementById("home-ver").textContent = OS_VERSION;
 document.getElementById("info-ver").textContent = OS_VERSION;
@@ -580,7 +580,6 @@ function showTool(key) {
       const url = URL.createObjectURL(blob);
       
       const frame = document.createElement("iframe");
-      // Set frame to 100% to fill the space left by the removed header
       frame.style.cssText = "width:100%; height:100%; border:none; background:#1a1a1a;";
       frame.src = url;
       wrap.innerHTML = "";
@@ -595,34 +594,45 @@ function launchGame(key) {
   const s = sites[key];
   const gameBase = `${getGameDir()}/${s.src}/`;
 
+  const gameWin = window.open("about:blank", "_blank");
+  
+  if (!gameWin) {
+    alert("Please allow popups to play games!");
+    return;
+  }
+
+  gameWin.document.title = s.name;
+
   fetch(`${gameBase}index.html`)
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
     .then(html => {
-      const processedHtml = `<head><base href="${gameBase}"></head>` + html;
-      const blob = new Blob([processedHtml], { type: 'text/html' });
-      const blobURL = URL.createObjectURL(blob);
-      
-      const frame = document.createElement("iframe");
-      frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;background:#000;";
-      frame.src = blobURL;
-      document.body.appendChild(frame);
+      const processedHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <base href="${gameBase}">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${s.name}</title>
+            <style>
+              body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+              iframe { width: 100%; height: 100%; border: none; }
+            </style>
+          </head>
+          <body>
+            ${html}
+          </body>
+        </html>
+      `;
 
-      const closeBtn = document.createElement("div");
-      closeBtn.innerText = "✕";
-      closeBtn.style.cssText = `position:fixed;top:10px;right:10px;z-index:10000;background:#960019;color:#fff;font-family:monospace;font-size:11px;font-weight:bold;padding:5px 10px;cursor:pointer;border:2px solid #fff;box-shadow:2px 2px 0 #000;user-select:none;opacity:1;transition:opacity 1.5s;`;
-      
-      closeBtn.onmouseenter = () => closeBtn.style.opacity = "1";
-      closeBtn.onmouseleave = () => closeBtn.style.opacity = "0.15";
-      setTimeout(() => closeBtn.style.opacity = "0.15", 2000);
-      
-      closeBtn.onclick = () => { 
-        frame.remove(); 
-        closeBtn.remove(); 
-        URL.revokeObjectURL(blobURL); 
-      };
-      document.body.appendChild(closeBtn);
+      gameWin.document.open();
+      gameWin.document.write(processedHtml);
+      gameWin.document.close();
     })
-    .catch(err => alert(`Failed to load '${s.name}': ${err.message}`));
+    .catch(err => {
+      gameWin.close();
+      alert(`Failed to load '${s.name}': ${err.message}`);
+    });
 }
 
 async function fetchGitHubStats() {
@@ -632,8 +642,7 @@ async function fetchGitHubStats() {
     const data = await res.json();
     
     LATEST_SHA = data.sha;
-    console.log("CheddarOS: Running on commit " + LATEST_SHA);
-
+    
     const fmt = new Intl.DateTimeFormat('en-US', { 
       year:'numeric', month:'2-digit', day:'2-digit', 
       hour:'numeric', minute:'2-digit', hour12:true, 
@@ -641,9 +650,21 @@ async function fetchGitHubStats() {
     });
     document.getElementById("ic-updated").textContent = fmt.format(new Date(data.commit.committer.date)).replace(',',' ');
 
-    const resCount = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=100');
-    const commits = await resCount.json();
-    document.getElementById("ic-commits").textContent = Array.isArray(commits) ? commits.length : "Not found";
+    const countRes = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=1');
+    const linkHeader = countRes.headers.get("Link");
+    
+    let totalCommits = "Unavailable";
+    if (linkHeader) {
+      const match = linkHeader.match(/page=(\d+)>; rel="last"/);
+      if (match) {
+        totalCommits = match[1];
+      }
+    } else {
+      const singlePage = await countRes.json();
+      totalCommits = Array.isArray(singlePage) ? singlePage.length : 0;
+    }
+
+    document.getElementById("ic-commits").textContent = totalCommits;
 
     const grid = document.getElementById("popular-grid");
     if (grid) {
@@ -652,7 +673,7 @@ async function fetchGitHubStats() {
     }
 
   } catch (err) { 
-    console.warn("CheddarOS: GitHub API limit reached or offline. Falling back to @main.");
+    console.warn("CheddarOS: GitHub API limit reached or error. Falling back.");
     document.getElementById("ic-updated").textContent = "Unavailable"; 
     document.getElementById("ic-commits").textContent = "Unavailable";
   }
