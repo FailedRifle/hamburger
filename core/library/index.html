@@ -279,25 +279,38 @@
       </div>
 
       <div class="page" id="page-info">
-        <div class="info-title">
-          <h2>CheddarOS Information</h2>
-          <div class="ver" id="info-ver"></div>
-        </div>
-        <div class="info-cards">
-          <div class="info-card">
-            <div class="ic-label">Last Updated</div>
-            <div class="ic-value" id="ic-updated">Loading...</div>
-          </div>
-          <div class="info-card">
-            <div class="ic-label">Version</div>
-            <div class="ic-value" id="ic-commits">Loading...</div>
-          </div>
-          <div class="info-card">
-            <div class="ic-label">Blocked by GoGuardian</div>
-            <div class="ic-value" id="ic-blocked">1</div>
-          </div>
-        </div>
-      </div>
+<div class="info-title">
+    <h2>CheddarOS Information</h2>
+    <div class="ver" id="info-ver"></div>
+</div>
+
+<div class="info-cards">
+    <div class="info-card">
+        <div class="ic-label">Last Updated</div>
+        <div class="ic-value" id="ic-updated">Loading...</div>
+    </div>
+    <div class="info-card">
+        <div class="ic-label">GitHub Version</div>
+        <div class="ic-value" id="ic-commits">Loading...</div>
+    </div>
+    <div class="info-card">
+        <div class="ic-label">Blocked by GoGuardian</div>
+        <div class="ic-value" id="ic-blocked">1</div>
+    </div>
+
+    <div class="info-card" style="border-color: var(--green);">
+        <div class="ic-label">Total Site Visits</div>
+        <div class="ic-value" id="stats-total">0</div>
+    </div>
+    <div class="info-card" style="border-color: var(--yellow);">
+        <div class="ic-label">Active Users</div>
+        <div class="ic-value" id="stats-active">0</div>
+    </div>
+    <div class="info-card">
+        <div class="ic-label">Daily Average</div>
+        <div class="ic-value" id="stats-avg">0</div>
+    </div>
+    </div>
 
       <div class="page" id="page-changelogs">
         <div class="changelog-list" id="changelog-list"></div>
@@ -427,6 +440,28 @@ function buildSidebar() {
     tEl.appendChild(btn);
   });
 }
+
+const CF_WORKER_URL = "https://hamburger-extra-cheddar-no-pickles.fauilting.workers.dev";
+
+async function updateCloudflareStats() {
+    try {
+        fetch(`${CF_WORKER_URL}/increment`);
+
+        const response = await fetch(`${CF_WORKER_URL}/api/stats`);
+        const data = await response.json();
+
+        document.getElementById('stats-total').textContent = data.total.toLocaleString();
+        document.getElementById('stats-active').textContent = data.active;
+        document.getElementById('stats-avg').textContent = data.average;
+    } catch (err) {
+        console.warn("CheddarOS: Could not load live stats.");
+        document.getElementById('stats-total').textContent = "Offline";
+        document.getElementById('stats-active').textContent = "Offline";
+        document.getElementById('stats-avg').textContent = "Offline";
+    }
+}
+
+updateCloudflareStats();
 
 function buildPopularGrid() {
   const popularKeys = ["zombies","geometrydash","buckshot","drifthunters"];
