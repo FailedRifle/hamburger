@@ -350,7 +350,6 @@ function getGameDir() { return `${REPO_BASE}@${LATEST_SHA}/games`; }
 function getToolDir() { return `${REPO_BASE}@${LATEST_SHA}/core/library/tools`; }
 
 const sites = {
-  "fnae":         { name: "Five Nights at Epstein's",  enabled: true,  src: "fnae",             desc: "Dont get molested." },
   "geometrydash": { name: "Geometry Dash Lite",         enabled: true,  src: "geometry-dash",    desc: "Jump and fly your way through danger in this rhythm-based action platformer." },
   "minecraft":    { name: "Minecraft v1.12.2",          enabled: true,  src: "minecraft",        desc: "Build, explore, and do what ever you want." },
   "zombies":      { name: "CoD Zombies",                enabled: true,  src: "nz-zombies",       desc: "Survive wave after wave of the nazi zombies." },
@@ -623,8 +622,8 @@ function launchGame(key) {
         URL.revokeObjectURL(blobURL); 
       };
       document.body.appendChild(closeBtn);
-    }) // This was missing
-    .catch(err => alert(`Failed to load '${s.name}': ${err.message}`)); // This was missing
+    })
+    .catch(err => alert(`Failed to load '${s.name}': ${err.message}`));
 }
 
 async function fetchGitHubStats() {
