@@ -94,6 +94,19 @@
   .page { display: none; padding: 28px 32px; }
   .page.active { display: block; }
 
+  .ad-slot {
+    background: var(--panel-bg);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 11px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .ad-slot-banner { width: 100%; height: 90px; }
+  .ad-slot-rect { width: 300px; height: 250px; flex-shrink: 0; }
+  .ad-slot-native { width: 100%; height: 120px; }
+
   .home-whats-new { margin-bottom: 32px; }
   .home-whats-new h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
   .home-whats-new .ver-tag { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
@@ -194,23 +207,27 @@
   .game-name-bar {
     padding: 14px 20px; font-size: 15px; font-weight: 600; color: var(--text);
   }
+
+  .game-body {
+    display: flex; gap: 24px; padding: 24px 32px; align-items: flex-start;
+  }
+  .game-body-left { flex: 1; }
   .game-desc-box {
-    margin: 24px 32px; background: var(--panel-bg); border: 1px solid var(--border);
+    background: var(--panel-bg); border: 1px solid var(--border);
     border-radius: 4px; padding: 24px; font-size: 14px; color: var(--text-dim); line-height: 1.6;
-    text-align: center;
   }
   .game-offline-notice {
-    margin: 24px 32px; padding: 14px 20px;
+    padding: 14px 20px;
     background: #2a0000; border: 1px solid var(--red);
     border-radius: 4px; font-size: 14px; color: var(--red);
   }
 
- #tool-page { 
-    display: none; 
-    padding: 0; 
-    flex-direction: column; 
+  #tool-page {
+    display: none;
+    padding: 0;
+    flex-direction: column;
     height: 100%;
- }
+  }
   #tool-page.active { display: flex; }
   .tool-header {
     padding: 16px 24px; border-bottom: 1px solid var(--border);
@@ -267,50 +284,74 @@
     <div id="main">
 
       <div class="page active" id="page-home">
+
         <div class="home-whats-new">
           <h2>What's new?</h2>
           <div class="ver-tag" id="home-ver"></div>
           <div class="changelog-preview" id="home-changelog-preview"></div>
         </div>
+
+        <div class="ad-slot ad-slot-native" id="ad-home-native">
+          <script async="async" data-cfasync="false" src="https://pl29021779.profitablecpmratenetwork.com/c729d56dcc7254130b6a0c0bf80b5723/invoke.js"></script>
+          <div id="container-c729d56dcc7254130b6a0c0bf80b5723"></div>
+        </div>
+
         <div class="home-popular">
-          <h3>Popular Games (icon.png under games/ game name)</h3>
+          <h3>Popular Games</h3>
           <div class="popular-grid" id="popular-grid"></div>
         </div>
+
+        <div id="ad-mobile-banner" style="display:none; justify-content:center; margin-top:16px;">
+          <script>
+            atOptions = {
+              'key' : '961ee3dd2dc65deb6ffad006f093c82b',
+              'format' : 'iframe',
+              'height' : 50,
+              'width' : 320,
+              'params' : {}
+            };
+          </script>
+          <script src="https://www.highperformanceformat.com/961ee3dd2dc65deb6ffad006f093c82b/invoke.js"></script>
+        </div>
+        <script>
+          if (window.innerWidth <= 600) {
+            document.getElementById('ad-mobile-banner').style.display = 'flex';
+          }
+        </script>
       </div>
 
       <div class="page" id="page-info">
-<div class="info-title">
-    <h2>CheddarOS Information</h2>
-    <div class="ver" id="info-ver"></div>
-</div>
-
-<div class="info-cards">
-    <div class="info-card">
-        <div class="ic-label">Last Updated</div>
-        <div class="ic-value" id="ic-updated">Loading...</div>
-    </div>
-    <div class="info-card">
-        <div class="ic-label">GitHub Version</div>
-        <div class="ic-value" id="ic-commits">Loading...</div>
-    </div>
-    <div class="info-card">
-        <div class="ic-label">Blocked by GoGuardian</div>
-        <div class="ic-value" id="ic-blocked">1</div>
-    </div>
-
-    <div class="info-card" style="border-color: var(--green);">
-        <div class="ic-label">Total Site Visits</div>
-        <div class="ic-value" id="stats-total">0</div>
-    </div>
-    <div class="info-card" style="border-color: var(--yellow);">
-        <div class="ic-label">Active Users</div>
-        <div class="ic-value" id="stats-active">0</div>
-    </div>
-    <div class="info-card">
-        <div class="ic-label">Daily Average</div>
-        <div class="ic-value" id="stats-avg">0</div>
-    </div>
-    </div>
+        <div class="info-title">
+          <h2>CheddarOS Information</h2>
+          <div class="ver" id="info-ver"></div>
+        </div>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="ic-label">Last Updated</div>
+            <div class="ic-value" id="ic-updated">Loading...</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">GitHub Version</div>
+            <div class="ic-value" id="ic-commits">Loading...</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">Blocked by GoGuardian</div>
+            <div class="ic-value" id="ic-blocked">1</div>
+          </div>
+          <div class="info-card" style="border-color: var(--green);">
+            <div class="ic-label">Total Site Visits</div>
+            <div class="ic-value" id="stats-total">0</div>
+          </div>
+          <div class="info-card" style="border-color: var(--yellow);">
+            <div class="ic-label">Active Users</div>
+            <div class="ic-value" id="stats-active">0</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">Daily Average</div>
+            <div class="ic-value" id="stats-avg">0</div>
+          </div>
+        </div>
+      </div>
 
       <div class="page" id="page-changelogs">
         <div class="changelog-list" id="changelog-list"></div>
@@ -328,7 +369,21 @@
           <button class="game-play-btn" id="game-play-btn">PLAY</button>
           <div class="game-name-bar" id="game-name-bar">Game name</div>
         </div>
-        <div id="game-desc-area"></div>
+        <div class="game-body">
+          <div class="game-body-left" id="game-desc-area"></div>
+          <div class="ad-slot ad-slot-rect" id="ad-game-rect">
+            <script>
+              atOptions = {
+                'key' : '81420262e31ebff2701a2d79b6d28006',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+              };
+            </script>
+            <script src="https://www.highperformanceformat.com/81420262e31ebff2701a2d79b6d28006/invoke.js"></script>
+          </div>
+        </div>
       </div>
 
       <div id="tool-page">
@@ -344,12 +399,25 @@
 
 <script>
 const OS_VERSION = "v1.0.0b";
+const ANNOUNCEMENT_TEXT = "ADs are now in Cheddar, I tried making them non-invasive as possible";
+const ADS_ENABLED = true;
+
+if (ADS_ENABLED) {
+  const s = document.createElement('script');
+  s.src = "https://pl29021778.profitablecpmratenetwork.com/6f/5f/02/6f5f02aeb8b231f99a438f7dde7e9f6c.js";
+  document.head.appendChild(s);
+}
+
 document.getElementById("logo-ver").textContent = OS_VERSION;
 document.getElementById("home-ver").textContent = OS_VERSION;
 document.getElementById("info-ver").textContent = OS_VERSION;
 document.title = `CheddarOS ${OS_VERSION}`;
 
-const ANNOUNCEMENT_TEXT = "i might add ads because i wanna get paid";
+if (!ADS_ENABLED) {
+  document.querySelectorAll('.ad-slot').forEach(el => el.remove());
+  document.getElementById('ad-mobile-banner')?.remove();
+}
+
 if (ANNOUNCEMENT_TEXT.trim()) {
   const nb = document.getElementById("notice-bar");
   nb.style.display = "block";
@@ -363,30 +431,30 @@ function getGameDir() { return `${REPO_BASE}@${LATEST_SHA}/games`; }
 function getToolDir() { return `${REPO_BASE}@${LATEST_SHA}/core/library/tools`; }
 
 const sites = {
-  "geometrydash": { name: "Geometry Dash Lite",         enabled: true,  src: "geometry-dash",    desc: "Jump and fly your way through danger in this rhythm-based action platformer." },
-  "minecraft":    { name: "Minecraft v1.12.2",          enabled: true,  src: "minecraft",        desc: "Build, explore, and do what ever you want." },
-  "zombies":      { name: "CoD Zombies",                enabled: true,  src: "nz-zombies",       desc: "Survive wave after wave of the nazi zombies." },
-  "sm64":         { name: "Super Mario 64",             enabled: true,  src: "sm64",             desc: "The legendary Nintendo 64 platformer, now in your browser." },
-  "potato":       { name: "Throw a Potato",             enabled: true,  src: "throw-a-potato",   desc: "Exactly what it sounds like. Throw potatoes." },
-  "snowrider":    { name: "Snow Rider 3D",              enabled: true,  src: "snow-rider3d",     desc: "Race down snowy slopes in this addictive 3D skiing game." },
-  "retrobowl":    { name: "Retro Bowl",                 enabled: true,  src: "retro-bowl",       desc: "Run your own football team in this retro-style sports game." },
-  "wrestlebros":  { name: "Wrestle Bros",               enabled: false, src: "wrestle-bros",     desc: "2-player wrestling fun. Currently offline." },
-  "buckshot":     { name: "Buckshot Roulette",          enabled: true,  src: "buckshot-roulette",desc: "A dark, intense take on Russian roulette with a shotgun." },
-  "drifthunters": { name: "Drift Hunters",              enabled: true,  src: "drift-hunters",    desc: "Earn cash by drifting and upgrade your car to the max." },
-  "basketball":   { name: "Basketball Legends 2020",    enabled: false, src: "basketball-legends",desc: "Play as legendary basketball stars." },
-  "cheddarclicker":{ name: "Cheddar Clicker",           enabled: true,  src: "cheddar-clicker",  desc: "VINNYYY!!! NUCCHHIII!!" },
-  "bloonstd4":    { name: "Bloons Tower Defense 4",     enabled: true,  src: "bloons-td4",       desc: "Pop bloons and defend your territory in this classic tower defense game." },
+  "snowrider":     { name: "Snow Rider 3D",           enabled: true,  src: "snow-rider3d",      desc: "Race down snowy slopes in this addictive 3D skiing game." },
+  "retrobowl":     { name: "Retro Bowl",              enabled: true,  src: "retro-bowl",         desc: "Run your own football team in this retro-style sports game." },
+  "wrestlebros":   { name: "Wrestle Bros",            enabled: false, src: "wrestle-bros",       desc: "2-player wrestling fun. Currently offline." },
+  "potato":        { name: "Throw a Potato",          enabled: true,  src: "throw-a-potato",     desc: "Exactly what it sounds like. Throw potatoes." },
+  "drifthunters":  { name: "Drift Hunters",           enabled: true,  src: "drift-hunters",      desc: "Earn cash by drifting and upgrade your car to the max." },
+  "basketball":    { name: "Basketball Legends 2020", enabled: false, src: "basketball-legends", desc: "Play as legendary basketball stars." },
+  "cheddarclicker":{ name: "Cheddar Clicker",         enabled: true,  src: "cheddar-clicker",    desc: "VINNYYY!!! NUCCHHIII!!" },
+  "bloonstd4":     { name: "Bloons Tower Defense 4",  enabled: true,  src: "bloons-td4",         desc: "Pop bloons and defend your territory in this classic tower defense game." },
+  "geometrydash":  { name: "Geometry Dash Lite",      enabled: true, src: "geometry-dash",      desc: "Disabled — original IP." },
+  "minecraft":     { name: "Minecraft v1.12.2",       enabled: true, src: "minecraft",          desc: "Disabled — original IP." },
+  "zombies":       { name: "CoD Zombies",             enabled: true, src: "nz-zombies",         desc: "Disabled — original IP." },
+  "sm64":          { name: "Super Mario 64",          enabled: true, src: "sm64",               desc: "Disabled — original IP." },
+  "buckshot":      { name: "Buckshot Roulette",       enabled: true, src: "buckshot-roulette",  desc: "Disabled — original IP." },
 };
 
 const tools = {
-  "html ide": { name: "CheddarOS IDE", enabled: true, src: "cheddar-ide"},
-  "formcracker": { name: "Google Form Cracker", enabled: true, src: "form-cracker"},
-  "gpt": { name: "CheddarGPT", enabled: true,  src: "gpt"},
+  "html ide":    { name: "CheddarOS IDE",          enabled: true, src: "cheddar-ide" },
+  "formcracker": { name: "Google Form Cracker",    enabled: true, src: "form-cracker" },
+  "gpt":         { name: "CheddarGPT",             enabled: true, src: "gpt" },
 };
 
 const changelogData = [
-  { ver: "v1.0.0", date: "3/30/2026", items: ["CheddarOS offically released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
-  { ver: "vBETA-1.0.0", date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
+  { ver: "v1.0.0",       date: "3/30/2026", items: ["CheddarOS officially released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
+  { ver: "vBETA-1.0.0",  date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
   { ver: "vALPHA-2.1.3", date: "3/14/2026", items: ["Fixed Bloons TD4"] },
   { ver: "vALPHA-2.1.2", date: "3/13/2026", items: ["Added Bloons TD4","Fixed formatting","Minor bug fixes"] },
   { ver: "vALPHA-2.1.1", date: "3/11/2026", items: ["Added Basketball Legends","Basketball Legends offline while looking for GoGuardian bypass"] },
@@ -444,30 +512,28 @@ function buildSidebar() {
 const CF_WORKER_URL = "https://hamburger-extra-cheddar-no-pickles.fauilting.workers.dev";
 
 async function updateCloudflareStats() {
-    try {
-        fetch(`${CF_WORKER_URL}/increment`);
-
-        const response = await fetch(`${CF_WORKER_URL}/api/stats`);
-        const data = await response.json();
-
-        document.getElementById('stats-total').textContent = data.total.toLocaleString();
-        document.getElementById('stats-active').textContent = data.active;
-        document.getElementById('stats-avg').textContent = data.average;
-    } catch (err) {
-        console.warn("CheddarOS: Could not load live stats.");
-        document.getElementById('stats-total').textContent = "Offline";
-        document.getElementById('stats-active').textContent = "Offline";
-        document.getElementById('stats-avg').textContent = "Offline";
-    }
+  try {
+    fetch(`${CF_WORKER_URL}/increment`);
+    const response = await fetch(`${CF_WORKER_URL}/api/stats`);
+    const data = await response.json();
+    document.getElementById('stats-total').textContent = data.total.toLocaleString();
+    document.getElementById('stats-active').textContent = data.active;
+    document.getElementById('stats-avg').textContent = data.average;
+  } catch (err) {
+    console.warn("CheddarOS: Could not load live stats.");
+    document.getElementById('stats-total').textContent = "Offline";
+    document.getElementById('stats-active').textContent = "Offline";
+    document.getElementById('stats-avg').textContent = "Offline";
+  }
 }
-
 updateCloudflareStats();
 
 function buildPopularGrid() {
-  const popularKeys = ["zombies","geometrydash","buckshot","drifthunters"];
+  const popularKeys = ["bloonstd4","drifthunters","retrobowl","snowrider"];
   const grid = document.getElementById("popular-grid");
   popularKeys.forEach(key => {
     const s = sites[key];
+    if (!s || !s.enabled) return;
     const card = document.createElement("div");
     card.className = "popular-card";
     card.innerHTML = `
@@ -500,9 +566,7 @@ function buildChangelogs() {
 
 function buildHomePreview() {
   const el = document.getElementById("home-changelog-preview");
-  
-  const recent = changelogData.slice(0, 1); 
-  
+  const recent = changelogData.slice(0, 1);
   el.innerHTML = "";
   recent.forEach(entry => {
     const div = document.createElement("div");
@@ -571,7 +635,7 @@ function showGame(key) {
   if (!s.enabled) {
     descArea.innerHTML = `<div class="game-offline-notice">
       '${s.name}' is not currently available.<br>
-      This game has been taken offline because of an error. Please check back next update.
+      This game has been taken offline. Please check back next update.
     </div>`;
     document.getElementById("game-play-btn").disabled = true;
     document.getElementById("game-play-btn").style.opacity = "0.4";
@@ -587,14 +651,14 @@ function showGame(key) {
 function showTool(key) {
   const t = tools[key];
   currentSidebarKey = key;
-  
+
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("game-page").classList.remove("active");
   document.getElementById("tool-page").classList.add("active");
   document.querySelectorAll(".sidebar-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
 
-  document.getElementById("tool-header").style.display = "none"; 
+  document.getElementById("tool-header").style.display = "none";
 
   const wrap = document.querySelector(".tool-frame-wrap");
   wrap.innerHTML = `<div class="tool-placeholder">Loading ${t.name}...</div>`;
@@ -605,14 +669,13 @@ function showTool(key) {
   }
 
   const toolBase = `${getToolDir()}/${t.src}/`;
-  
+
   fetch(`${toolBase}index.html`)
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
     .then(html => {
       const processedHtml = `<head><base href="${toolBase}"></head>` + html;
       const blob = new Blob([processedHtml], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
-      
       const frame = document.createElement("iframe");
       frame.style.cssText = "width:100%; height:100%; border:none; background:#1a1a1a;";
       frame.src = url;
@@ -629,7 +692,6 @@ function launchGame(key) {
   const gameUrl = `${getGameDir()}/${s.src}/index.html`;
 
   const win = window.open('about:blank', '_blank');
-  
   if (!win) {
     alert("Pop-up blocked! Please allow pop-ups to launch games.");
     return;
@@ -672,41 +734,35 @@ async function fetchGitHubStats() {
     const res = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits/main');
     if (!res.ok) throw new Error();
     const data = await res.json();
-    
+
     LATEST_SHA = data.sha;
-    
-    const fmt = new Intl.DateTimeFormat('en-US', { 
-      year:'numeric', month:'2-digit', day:'2-digit', 
-      hour:'numeric', minute:'2-digit', hour12:true, 
-      timeZone:'America/New_York', timeZoneName:'short' 
+
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'numeric', minute:'2-digit', hour12:true,
+      timeZone:'America/New_York', timeZoneName:'short'
     });
     document.getElementById("ic-updated").textContent = fmt.format(new Date(data.commit.committer.date)).replace(',',' ');
 
     const countRes = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=1');
     const linkHeader = countRes.headers.get("Link");
-    
+
     let totalCommits = "Unavailable";
     if (linkHeader) {
       const match = linkHeader.match(/page=(\d+)>; rel="last"/);
-      if (match) {
-        totalCommits = match[1];
-      }
+      if (match) totalCommits = match[1];
     } else {
       const singlePage = await countRes.json();
       totalCommits = Array.isArray(singlePage) ? singlePage.length : 0;
     }
-
     document.getElementById("ic-commits").textContent = totalCommits;
 
     const grid = document.getElementById("popular-grid");
-    if (grid) {
-      grid.innerHTML = "";
-      buildPopularGrid();
-    }
+    if (grid) { grid.innerHTML = ""; buildPopularGrid(); }
 
-  } catch (err) { 
-    console.warn("CheddarOS: GitHub API limit reached or error. Falling back.");
-    document.getElementById("ic-updated").textContent = "Unavailable"; 
+  } catch (err) {
+    console.warn("CheddarOS: GitHub API limit reached or error.");
+    document.getElementById("ic-updated").textContent = "Unavailable";
     document.getElementById("ic-commits").textContent = "Unavailable";
   }
 }
