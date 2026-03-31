@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #1a1a1a;
+    --sidebar-bg: #111111;
+    --panel-bg: #222222;
+    --card-bg: #2a2a2a;
+    --border: #333333;
+    --text: #e0e0e0;
+    --text-dim: #888888;
+    --text-muted: #555555;
+    --accent: #ffffff;
+    --red: #cc3333;
+    --green: #44aa44;
+    --yellow: #ccaa00;
+    --header-h: 56px;
+    --sidebar-w: 220px;
+    --font: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); }
+
+  #app { display: flex; flex-direction: column; height: 100vh; }
+
+  #header {
+    display: flex; align-items: center;
+    height: var(--header-h); min-height: var(--header-h);
+    border-bottom: 1px solid var(--border);
+    background: var(--sidebar-bg);
+    flex-shrink: 0;
+  }
+  #logo {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    padding: 0 16px; border-right: 1px solid var(--border);
+    height: 100%; display: flex; flex-direction: column; justify-content: center;
+  }
+  #logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); line-height: 1; }
+  #logo .ver { font-size: 11px; color: var(--text-dim); margin-left: 2px; }
+  #logo .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  #nav { display: flex; align-items: center; gap: 0; height: 100%; padding: 0 20px; }
+  .nav-btn {
+    background: none; border: none; color: var(--text-dim);
+    font-family: var(--font); font-size: 14px; font-weight: 500;
+    padding: 0 24px; height: 100%; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+    transition: color 0.15s;
+    position: relative;
+  }
+  .nav-btn:hover { color: var(--accent); }
+  .nav-btn.active { color: var(--accent); font-weight: 700; }
+  .nav-btn.active::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--accent);
+  }
+
+  #body { display: flex; flex: 1; overflow: hidden; }
+
+  #sidebar {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; flex-shrink: 0;
+    padding-top: 8px;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .sidebar-section { margin-bottom: 4px; }
+  .sidebar-header {
+    padding: 10px 16px 6px;
+    font-size: 12px; font-weight: 700; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .sidebar-item {
+    display: block; width: 100%; background: none; border: none;
+    text-align: left; padding: 7px 16px;
+    font-family: var(--font); font-size: 14px; color: var(--text);
+    cursor: pointer; transition: background 0.1s, color 0.1s;
+  }
+  .sidebar-item:hover { background: var(--panel-bg); }
+  .sidebar-item.active { background: var(--border); color: var(--accent); font-weight: 600; }
+  .sidebar-item.offline { color: var(--red); }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+  #main { flex: 1; overflow-y: auto; background: var(--bg); }
+  #main::-webkit-scrollbar { width: 6px; }
+  #main::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .page { display: none; padding: 28px 32px; }
+  .page.active { display: block; }
+
+  .ad-slot {
+    background: var(--panel-bg);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 11px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .ad-slot-banner { width: 100%; height: 90px; }
+  .ad-slot-rect { width: 300px; height: 250px; flex-shrink: 0; }
+  .ad-slot-native { width: 100%; height: 120px; }
+
+  .home-whats-new { margin-bottom: 32px; }
+  .home-whats-new h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .home-whats-new .ver-tag { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
+  .home-whats-new p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+  .changelog-preview { margin-top: 12px; }
+  .changelog-entry {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px 18px; margin-bottom: 10px;
+  }
+  .changelog-entry .entry-ver { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .changelog-entry .entry-date { font-size: 11px; color: var(--text-muted); margin-left: 10px; }
+  .changelog-entry ul { margin-top: 8px; padding-left: 18px; }
+  .changelog-entry li { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+  .home-popular h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; }
+  .popular-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+  .popular-card {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden; cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .popular-card:hover { border-color: #666; transform: translateY(-2px); }
+  .popular-card .card-img {
+    width: 100%; aspect-ratio: 4/3; background: var(--card-bg);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .popular-card .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .popular-card .card-img .no-img {
+    font-size: 11px; color: var(--text-muted); text-align: center;
+  }
+  .popular-card .card-label {
+    padding: 8px 10px; font-size: 12px; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .info-title {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    display: inline-block; padding: 10px 24px; margin-bottom: 24px; border-radius: 2px;
+  }
+  .info-title h2 { font-size: 18px; font-weight: 700; color: var(--accent); }
+  .info-title .ver { font-size: 12px; color: var(--text-dim); }
+  .info-cards { display: flex; gap: 16px; flex-wrap: wrap; }
+  .info-card {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 20px 28px; min-width: 200px; text-align: center;
+  }
+  .info-card .ic-label { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .info-card .ic-value { font-size: 13px; color: var(--text-dim); }
+
+  .changelog-list { }
+  .cl-entry {
+    border-bottom: 1px solid var(--border); padding: 14px 0;
+  }
+  .cl-entry:first-child { padding-top: 0; }
+  .cl-ver { font-size: 14px; font-weight: 700; color: var(--accent); }
+  .cl-date { font-size: 12px; color: var(--text-muted); margin-left: 10px; }
+  .cl-items { margin-top: 6px; padding-left: 16px; }
+  .cl-items li { font-size: 13px; color: var(--text-dim); line-height: 1.75; }
+
+  .credits-section { margin-bottom: 28px; }
+  .credits-role {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    display: inline-block; padding: 6px 18px; margin-bottom: 10px;
+    font-size: 14px; font-weight: 600; color: var(--accent);
+  }
+  .credits-people { padding-left: 16px; margin-bottom: 4px; }
+  .credits-people li { font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+  .credits-disclaimer {
+    margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-muted); font-style: italic;
+  }
+
+  #game-page { display: none; padding: 0; flex-direction: column; }
+  #game-page.active { display: flex; }
+  .game-banner {
+    width: 100%; background: var(--panel-bg);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 280px; border-bottom: 1px solid var(--border); overflow: hidden;
+  }
+  .game-banner img { width: 100%; max-height: 320px; object-fit: cover; }
+  .game-banner .no-banner {
+    width: 100%; height: 280px; display: flex; align-items: center; justify-content: center;
+    background: var(--panel-bg); color: var(--text-muted); font-size: 14px;
+  }
+  .game-meta {
+    display: flex; align-items: center; gap: 0;
+    background: var(--card-bg); border-bottom: 1px solid var(--border);
+  }
+  .game-play-btn {
+    background: var(--card-bg); border: none; border-right: 1px solid var(--border);
+    color: var(--accent); font-family: var(--font); font-size: 15px; font-weight: 700;
+    padding: 14px 32px; cursor: pointer; transition: background 0.15s;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .game-play-btn:hover { background: #333; }
+  .game-name-bar {
+    padding: 14px 20px; font-size: 15px; font-weight: 600; color: var(--text);
+  }
+
+  .game-body {
+    display: flex; gap: 24px; padding: 24px 32px; align-items: flex-start;
+  }
+  .game-body-left { flex: 1; }
+  .game-desc-box {
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 24px; font-size: 14px; color: var(--text-dim); line-height: 1.6;
+  }
+  .game-offline-notice {
+    padding: 14px 20px;
+    background: #2a0000; border: 1px solid var(--red);
+    border-radius: 4px; font-size: 14px; color: var(--red);
+  }
+
+  #tool-page {
+    display: none;
+    padding: 0;
+    flex-direction: column;
+    height: 100%;
+  }
+  #tool-page.active { display: flex; }
+  .tool-header {
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    font-size: 16px; font-weight: 600; color: var(--accent);
+    background: var(--panel-bg);
+  }
+  .tool-frame-wrap { flex: 1; background: var(--card-bg); display: flex; align-items: center; justify-content: center; }
+  .tool-placeholder { font-size: 14px; color: var(--text-muted); }
+
+  #notice-bar {
+    background: #2a0000; border-bottom: 1px solid var(--red);
+    padding: 6px 32px; font-size: 12px; color: var(--red); font-weight: 600;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="header">
+    <div id="logo">
+      <h1>CheddarOS <span class="ver" id="logo-ver"></span></h1>
+      <div class="sub">created by mhauber</div>
+    </div>
+    <nav id="nav">
+      <button class="nav-btn active" data-tab="home">HOME</button>
+      <button class="nav-btn" data-tab="info">INFO</button>
+      <button class="nav-btn" data-tab="changelogs">CHANGELOGS</button>
+      <button class="nav-btn" data-tab="credits">CREDITS</button>
+    </nav>
+  </div>
+
+  <div id="notice-bar" style="display:none"></div>
+
+  <div id="body">
+
+    <div id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-header">- ALL GAMES</div>
+        <div id="games-sidebar"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">- TOOLS</div>
+        <div id="tools-sidebar"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">- OFFLINE</div>
+        <div id="offline-sidebar"></div>
+      </div>
+    </div>
+
+    <div id="main">
+
+      <div class="page active" id="page-home">
+
+        <div class="home-whats-new">
+          <h2>What's new?</h2>
+          <div class="ver-tag" id="home-ver"></div>
+          <div class="changelog-preview" id="home-changelog-preview"></div>
+        </div>
+
+        <div class="ad-slot ad-slot-native" id="ad-home-native">
+          <script async="async" data-cfasync="false" src="https://pl29021779.profitablecpmratenetwork.com/c729d56dcc7254130b6a0c0bf80b5723/invoke.js"></script>
+          <div id="container-c729d56dcc7254130b6a0c0bf80b5723"></div>
+        </div>
+
+        <div class="home-popular">
+          <h3>Popular Games</h3>
+          <div class="popular-grid" id="popular-grid"></div>
+        </div>
+
+        <div id="ad-mobile-banner" style="display:none; justify-content:center; margin-top:16px;">
+          <script>
+            atOptions = {
+              'key' : '961ee3dd2dc65deb6ffad006f093c82b',
+              'format' : 'iframe',
+              'height' : 50,
+              'width' : 320,
+              'params' : {}
+            };
+          </script>
+          <script src="https://www.highperformanceformat.com/961ee3dd2dc65deb6ffad006f093c82b/invoke.js"></script>
+        </div>
+        <script>
+          if (window.innerWidth <= 600) {
+            document.getElementById('ad-mobile-banner').style.display = 'flex';
+          }
+        </script>
+      </div>
+
+      <div class="page" id="page-info">
+        <div class="info-title">
+          <h2>CheddarOS Information</h2>
+          <div class="ver" id="info-ver"></div>
+        </div>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="ic-label">Last Updated</div>
+            <div class="ic-value" id="ic-updated">Loading...</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">GitHub Version</div>
+            <div class="ic-value" id="ic-commits">Loading...</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">Blocked by GoGuardian</div>
+            <div class="ic-value" id="ic-blocked">1</div>
+          </div>
+          <div class="info-card" style="border-color: var(--green);">
+            <div class="ic-label">Total Site Visits</div>
+            <div class="ic-value" id="stats-total">0</div>
+          </div>
+          <div class="info-card" style="border-color: var(--yellow);">
+            <div class="ic-label">Active Users</div>
+            <div class="ic-value" id="stats-active">0</div>
+          </div>
+          <div class="info-card">
+            <div class="ic-label">Daily Average</div>
+            <div class="ic-value" id="stats-avg">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-changelogs">
+        <div class="changelog-list" id="changelog-list"></div>
+      </div>
+
+      <div class="page" id="page-credits">
+        <div id="credits-content"></div>
+      </div>
+
+      <div id="game-page">
+        <div class="game-banner" id="game-banner">
+          <div class="no-banner">No image</div>
+        </div>
+        <div class="game-meta">
+          <button class="game-play-btn" id="game-play-btn">PLAY</button>
+          <div class="game-name-bar" id="game-name-bar">Game name</div>
+        </div>
+        <div class="game-body">
+          <div class="game-body-left" id="game-desc-area"></div>
+          <div class="ad-slot ad-slot-rect" id="ad-game-rect">
+            <script>
+              atOptions = {
+                'key' : '81420262e31ebff2701a2d79b6d28006',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+              };
+            </script>
+            <script src="https://www.highperformanceformat.com/81420262e31ebff2701a2d79b6d28006/invoke.js"></script>
+          </div>
+        </div>
+      </div>
+
+      <div id="tool-page">
+        <div class="tool-header" id="tool-header">Tool name</div>
+        <div class="tool-frame-wrap">
+          <div class="tool-placeholder">Write the tool html here</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const OS_VERSION = "v1.0.1";
+const ANNOUNCEMENT_TEXT = "ADs are now in Cheddar, I tried making them non-invasive as possible";
+const ADS_ENABLED = true;
+
+if (ADS_ENABLED) {
+  const s = document.createElement('script');
+  s.src = "https://pl29021778.profitablecpmratenetwork.com/6f/5f/02/6f5f02aeb8b231f99a438f7dde7e9f6c.js";
+  document.head.appendChild(s);
+}
+
+document.getElementById("logo-ver").textContent = OS_VERSION;
+document.getElementById("home-ver").textContent = OS_VERSION;
+document.getElementById("info-ver").textContent = OS_VERSION;
+document.title = `CheddarOS ${OS_VERSION}`;
+
+if (!ADS_ENABLED) {
+  document.querySelectorAll('.ad-slot').forEach(el => el.remove());
+  document.getElementById('ad-mobile-banner')?.remove();
+}
+
+if (ANNOUNCEMENT_TEXT.trim()) {
+  const nb = document.getElementById("notice-bar");
+  nb.style.display = "block";
+  nb.textContent = "[NOTICE] " + ANNOUNCEMENT_TEXT;
+}
+
+let LATEST_SHA = "main";
+const REPO_BASE = "https://cdn.jsdelivr.net/gh/FailedRifle/hamburger";
+
+function getGameDir() { return `${REPO_BASE}@${LATEST_SHA}/games`; }
+function getToolDir() { return `${REPO_BASE}@${LATEST_SHA}/core/library/tools`; }
+
+const sites = {
+ "snowrider": { name: "Snow Rider 3D",           enabled: true,  src: "snow-rider3d",      desc: "no desc currently" },
+ "retrobowl": { name: "Retro Bowl",              enabled: true,  src: "retro-bowl",         desc: "no desc currently" },
+ "wrestlebros": { name: "Wrestle Bros",            enabled: false, src: "wrestle-bros",       desc: "no desc currently" },
+ "potato": { name: "Throw a Potato",          enabled: true,  src: "throw-a-potato",     desc: "no desc currently" },
+ "drifthunters": { name: "Drift Hunters",           enabled: true,  src: "drift-hunters",      desc: "no desc currently" },
+ "basketball": { name: "Basketball Legends 2020", enabled: false, src: "basketball-legends", desc: "no desc currently" },
+ "cheddarclicker": { name: "Cheddar Clicker",         enabled: true,  src: "cheddar-clicker",    desc: "no desc currently" },
+ "bloonstd4": { name: "Bloons Tower Defense 4",  enabled: true,  src: "bloons-td4",         desc: "no desc currently" },
+ "geometrydash": { name: "Geometry Dash Lite",      enabled: true, src: "geometry-dash",      desc: "no desc currently" },
+ "minecraft": { name: "Minecraft v1.12.2",       enabled: true, src: "minecraft",          desc: "no desc currently" },
+ "zombies": { name: "CoD Zombies",             enabled: true, src: "nz-zombies",         desc: "no desc currently" },
+ "sm64": { name: "Super Mario 64",          enabled: true, src: "sm64",               desc: "no desc currently" },
+ "buckshot": { name: "Buckshot Roulette",       enabled: true, src: "buckshot-roulette",  desc: "no desc currently" },
+ "fnaf1": { name: "Five Nights at Freddy's", enabled: true, src: "fnaf1", desc: "no desc currently" },
+ "fnaf2": { name: "Five Nights at Freddy's 2", enabled: true, src: "fnaf2", desc: "no desc currently" },
+ "fnaf3": { name: "Five Nights at Freddy's 3", enabled: true, src: "fnaf3", desc: "no desc currently" },
+ "fnaf4": { name: "Five Nights at Freddy's 4", enabled: true, src: "fnaf4", desc: "no desc currently" },
+};
+
+const tools = {
+  "html ide":    { name: "CheddarOS IDE",          enabled: true, src: "cheddar-ide" },
+  "formcracker": { name: "Google Form Cracker",    enabled: true, src: "form-cracker" },
+  "gpt":         { name: "CheddarGPT",             enabled: true, src: "gpt" },
+};
+
+ // TEMPLATE -  { ver: "", date: "", items: [""] },
+const changelogData = [
+ { ver: "v1.0.1", date: "3/31/2026", items: ["Offically went public!","Added FNaF 1-4", "CheddarGPT is undermaintaince while I fix the API","Advertisments added because I wasnt getting paid and this is a hobby project to me"] },
+  { ver: "v1.0.0", date: "3/30/2026", items: ["CheddarOS officially released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
+  { ver: "vBETA-1.0.0", date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
+  { ver: "vALPHA-2.1.3", date: "3/14/2026", items: ["Fixed Bloons TD4"] },
+  { ver: "vALPHA-2.1.2", date: "3/13/2026", items: ["Added Bloons TD4","Fixed formatting","Minor bug fixes"] },
+  { ver: "vALPHA-2.1.1", date: "3/11/2026", items: ["Added Basketball Legends","Basketball Legends offline while looking for GoGuardian bypass"] },
+  { ver: "vALPHA-2.1.0", date: "3/9/2026",  items: ["Completely changed how games load","Games load faster than ever","Reduced lag in every game and inside CheddarOS","Fixed GoGuardian bypass for Buckshot Roulette","Shell Shockers removed"] },
+  { ver: "vALPHA-2.0.3", date: "3/8/2026",  items: ["Added Drift Hunters"] },
+  { ver: "vALPHA-2.0.2", date: "3/7/2026",  items: ["Added an info command to see more information about CheddarOS"] },
+  { ver: "vALPHA-2.0.1", date: "3/7/2026",  items: ["Formatted the games and the help list to look more professional","Added an announcement text","Minor bug fixes"] },
+  { ver: "vALPHA-2.0.0", date: "3/4/2026",  items: ["Completely revamped the UI","Changed tab name and icon"] },
+  { ver: "vALPHA-1.1.0", date: "2/27/2026", items: ["Massive Code Cleanup"] },
+  { ver: "vALPHA-1.0.10",date: "2/27/2026", items: ["Added Buckshot Roulette"] },
+  { ver: "vALPHA-1.0.9", date: "2/27/2026", items: ["Added Wrestle Bros"] },
+  { ver: "vALPHA-1.0.8", date: "2/27/2026", items: ["Formatted the credits screen"] },
+  { ver: "vALPHA-1.0.7", date: "2/26/2026", items: ["Added Shell Shockers"] },
+  { ver: "vALPHA-1.0.6", date: "2/26/2026", items: ["Added Retro Bowl"] },
+  { ver: "vALPHA-1.0.5b",date: "2/26/2026", items: ["Minor bug fixes","Cut the loading speed in half"] },
+  { ver: "vALPHA-1.0.5", date: "2/25/2026", items: ["Throw a Potato fixed","Removed ads","FNaE revamp","Fixed Snow Rider 3D black screen"] },
+  { ver: "vALPHA-1.0.4", date: "2/25/2026", items: ["FNaE back online"] },
+  { ver: "vALPHA-1.0.3", date: "2/25/2026", items: ["FNaE taken offline","Throw a Potato offline (GoGuardian)"] },
+  { ver: "vALPHA-1.0.2", date: "2/23/2026", items: ["Minor fixes","Throw a Potato playable","Added Snow Rider 3D (WIP)"] },
+  { ver: "vALPHA-1.0.1", date: "2/23/2026", items: ["Throw a Potato maintenance"] },
+  { ver: "vALPHA-1.0.0", date: "2/23/2026", items: ["CheddarOS early private access release."] },
+];
+
+const creditsData = [
+  { role: "LEAD PROGRAMMER", people: ["Matt Hauber (Cheddar Hobbs)"] },
+  { role: "CONTRIBUTORS",    people: ["Matt Marakovits","Joey Lombardo (Joronster)","Alex Falana"] },
+  { role: "TESTERS",         people: ["Jadell Vargas (Jelly)","Vinny Nucci (Vinchenzo)","Max Dankies","Tyler Hartman"] },
+];
+const creditsDisclaimer = "All Testers and Contributors are not affiliated in any way with the development of CheddarOS.";
+
+function buildSidebar() {
+  const gEl = document.getElementById("games-sidebar");
+  const oEl = document.getElementById("offline-sidebar");
+  const tEl = document.getElementById("tools-sidebar");
+
+  Object.entries(sites).sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, s]) => {
+    const btn = document.createElement("button");
+    btn.className = "sidebar-item" + (!s.enabled ? " offline" : "");
+    btn.textContent = key;
+    btn.dataset.key = key;
+    btn.onclick = () => showGame(key);
+    (s.enabled ? gEl : oEl).appendChild(btn);
+  });
+
+  Object.entries(tools).sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, t]) => {
+    const btn = document.createElement("button");
+    btn.className = "sidebar-item" + (!t.enabled ? " offline" : "");
+    btn.textContent = key;
+    btn.dataset.key = key;
+    btn.onclick = () => showTool(key);
+    tEl.appendChild(btn);
+  });
+}
+
+const CF_WORKER_URL = "https://hamburger-extra-cheddar-no-pickles.fauilting.workers.dev";
+
+async function updateCloudflareStats() {
+  try {
+    fetch(`${CF_WORKER_URL}/increment`);
+    const response = await fetch(`${CF_WORKER_URL}/api/stats`);
+    const data = await response.json();
+    document.getElementById('stats-total').textContent = data.total.toLocaleString();
+    document.getElementById('stats-active').textContent = data.active;
+    document.getElementById('stats-avg').textContent = data.average;
+  } catch (err) {
+    console.warn("CheddarOS: Could not load live stats.");
+    document.getElementById('stats-total').textContent = "Offline";
+    document.getElementById('stats-active').textContent = "Offline";
+    document.getElementById('stats-avg').textContent = "Offline";
+  }
+}
+updateCloudflareStats();
+
+function buildPopularGrid() {
+  const popularKeys = ["bloonstd4","drifthunters","retrobowl","snowrider"];
+  const grid = document.getElementById("popular-grid");
+  popularKeys.forEach(key => {
+    const s = sites[key];
+    if (!s || !s.enabled) return;
+    const card = document.createElement("div");
+    card.className = "popular-card";
+    card.innerHTML = `
+      <div class="card-img">
+        <img src="${getGameDir()}/${s.src}/icon.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <div class="no-img" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;flex-direction:column;">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="2" y="6" width="36" height="28" rx="2" stroke="#555" stroke-width="2"/><circle cx="14" cy="16" r="4" stroke="#555" stroke-width="2"/><path d="M2 30 L14 18 L22 26 L28 20 L38 30" stroke="#555" stroke-width="2"/></svg>
+          <span style="font-size:10px;color:#555;margin-top:4px">No image</span>
+        </div>
+      </div>
+      <div class="card-label">${s.name}</div>
+    `;
+    card.onclick = () => showGame(key);
+    grid.appendChild(card);
+  });
+}
+
+function buildChangelogs() {
+  const el = document.getElementById("changelog-list");
+  changelogData.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "cl-entry";
+    div.innerHTML = `
+      <span class="cl-ver">${entry.ver}</span><span class="cl-date">${entry.date}</span>
+      <ul class="cl-items">${entry.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function buildHomePreview() {
+  const el = document.getElementById("home-changelog-preview");
+  const recent = changelogData.slice(0, 1);
+  el.innerHTML = "";
+  recent.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "changelog-entry";
+    div.innerHTML = `
+      <span class="entry-ver">${entry.ver}</span><span class="entry-date">${entry.date}</span>
+      <ul>${entry.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function buildCredits() {
+  const el = document.getElementById("credits-content");
+  creditsData.forEach(section => {
+    const div = document.createElement("div");
+    div.className = "credits-section";
+    div.innerHTML = `
+      <div class="credits-role">${section.role}</div>
+      <ul class="credits-people">${section.people.map(p=>`<li>${p}</li>`).join('')}</ul>
+    `;
+    el.appendChild(div);
+  });
+  const disc = document.createElement("div");
+  disc.className = "credits-disclaimer";
+  disc.textContent = creditsDisclaimer;
+  el.appendChild(disc);
+}
+
+let currentTab = "home";
+let currentSidebarKey = null;
+
+function showTab(tab) {
+  currentTab = tab;
+  currentSidebarKey = null;
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("game-page").classList.remove("active");
+  document.getElementById("tool-page").classList.remove("active");
+  document.getElementById(`page-${tab}`)?.classList.add("active");
+  document.querySelectorAll(".sidebar-item").forEach(b => b.classList.remove("active"));
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.onclick = () => showTab(btn.dataset.tab);
+});
+
+function showGame(key) {
+  const s = sites[key];
+  currentSidebarKey = key;
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("tool-page").classList.remove("active");
+  document.getElementById("game-page").classList.add("active");
+  document.querySelectorAll(".sidebar-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+
+  const bannerEl = document.getElementById("game-banner");
+  bannerEl.innerHTML = `
+    <img src="${getGameDir()}/${s.src}/banner.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+    <div class="no-banner" style="display:none">No image</div>
+  `;
+
+  document.getElementById("game-name-bar").textContent = s.name;
+
+  const descArea = document.getElementById("game-desc-area");
+  if (!s.enabled) {
+    descArea.innerHTML = `<div class="game-offline-notice">
+      '${s.name}' is not currently available.<br>
+      This game has been taken offline. Please check back next update.
+    </div>`;
+    document.getElementById("game-play-btn").disabled = true;
+    document.getElementById("game-play-btn").style.opacity = "0.4";
+  } else {
+    descArea.innerHTML = `<div class="game-desc-box">${s.desc}</div>`;
+    document.getElementById("game-play-btn").disabled = false;
+    document.getElementById("game-play-btn").style.opacity = "1";
+  }
+
+  document.getElementById("game-play-btn").onclick = s.enabled ? () => launchGame(key) : null;
+}
+
+function showTool(key) {
+  const t = tools[key];
+  currentSidebarKey = key;
+
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("game-page").classList.remove("active");
+  document.getElementById("tool-page").classList.add("active");
+  document.querySelectorAll(".sidebar-item").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+
+  document.getElementById("tool-header").style.display = "none";
+
+  const wrap = document.querySelector(".tool-frame-wrap");
+  wrap.innerHTML = `<div class="tool-placeholder">Loading ${t.name}...</div>`;
+
+  if (!t.enabled) {
+    wrap.innerHTML = `<div class="tool-placeholder" style="color:#cc3333">${t.name} is currently disabled.</div>`;
+    return;
+  }
+
+  const toolBase = `${getToolDir()}/${t.src}/`;
+
+  fetch(`${toolBase}index.html`)
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+    .then(html => {
+      const processedHtml = `<head><base href="${toolBase}"></head>` + html;
+      const blob = new Blob([processedHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const frame = document.createElement("iframe");
+      frame.style.cssText = "width:100%; height:100%; border:none; background:#1a1a1a;";
+      frame.src = url;
+      wrap.innerHTML = "";
+      wrap.appendChild(frame);
+    })
+    .catch(err => {
+      wrap.innerHTML = `<div class="tool-placeholder" style="color:#cc3333">Error loading tool: ${err.message}</div>`;
+    });
+}
+
+function launchGame(key) {
+  const s = sites[key];
+  const gameUrl = `${getGameDir()}/${s.src}/index.html`;
+
+  const win = window.open('about:blank', '_blank');
+  if (!win) {
+    alert("Pop-up blocked! Please allow pop-ups to launch games.");
+    return;
+  }
+
+  const injection = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>injecting the cheddar</title>
+    <style>body,html{margin:0;padding:0;height:100%;overflow:hidden;background:#000;}</style>
+</head>
+<body>
+    <script>
+        const link = '${gameUrl}';
+        fetch(link)
+            .then(r => {
+                if(!r.ok) throw new Error('Network response was not ok');
+                return r.text();
+            })
+            .then(d => {
+                document.open();
+                document.write(d);
+                document.close();
+            })
+            .catch(err => {
+                document.body.innerHTML = '<div style="color:white;text-align:center;padding-top:20px;font-family:sans-serif;">Failed to load game data.</div>';
+            });
+    <\/script>
+</body>
+</html>`;
+
+  win.document.open();
+  win.document.write(injection);
+  win.document.close();
+}
+
+async function fetchGitHubStats() {
+  try {
+    const res = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits/main');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+
+    LATEST_SHA = data.sha;
+
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'numeric', minute:'2-digit', hour12:true,
+      timeZone:'America/New_York', timeZoneName:'short'
+    });
+    document.getElementById("ic-updated").textContent = fmt.format(new Date(data.commit.committer.date)).replace(',',' ');
+
+    const countRes = await fetch('https://api.github.com/repos/FailedRifle/hamburger/commits?sha=main&per_page=1');
+    const linkHeader = countRes.headers.get("Link");
+
+    let totalCommits = "Unavailable";
+    if (linkHeader) {
+      const match = linkHeader.match(/page=(\d+)>; rel="last"/);
+      if (match) totalCommits = match[1];
+    } else {
+      const singlePage = await countRes.json();
+      totalCommits = Array.isArray(singlePage) ? singlePage.length : 0;
+    }
+    document.getElementById("ic-commits").textContent = totalCommits;
+
+    const grid = document.getElementById("popular-grid");
+    if (grid) { grid.innerHTML = ""; buildPopularGrid(); }
+
+  } catch (err) {
+    console.warn("CheddarOS: GitHub API limit reached or error.");
+    document.getElementById("ic-updated").textContent = "Unavailable";
+    document.getElementById("ic-commits").textContent = "Unavailable";
+  }
+}
+
+buildSidebar();
+buildPopularGrid();
+buildChangelogs();
+buildHomePreview();
+buildCredits();
+fetchGitHubStats();
+</script>
+</body>
+</html>
