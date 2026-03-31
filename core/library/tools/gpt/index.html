@@ -79,18 +79,16 @@
   .msg-body pre { margin: 0.75em 0; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; }
   .msg-body pre .code-header { display: flex; align-items: center; justify-content: space-between; background: #2d2f31; padding: 5px 12px; font-size: 11px; font-family: "SFMono-Regular",Consolas,monospace; color: #888; border-bottom: 1px solid var(--border); user-select: none; }
   .msg-body pre .copy-btn { background: transparent; border: 1px solid #555; color: #aaa; font-size: 10px; padding: 1px 7px; border-radius: 3px; cursor: pointer; font-family: system-ui,sans-serif; }
-/* 1. Constrain the container */
   .msg-body pre { 
     margin: 0.75em 0; 
     border-radius: 6px; 
     border: 1px solid var(--border); 
     overflow: hidden; 
-    max-width: 100%;    /* Ensures it never exceeds the bubble width */
-    display: flex;      /* Helps contain the internal code element */
+    max-width: 100%;
+    display: flex;
     flex-direction: column;
   }
 
-  /* 2. Force the text to stay inside and wrap */
   .msg-body pre code { 
     background: transparent !important; 
     border: none; 
@@ -100,10 +98,10 @@
     border-radius: 0; 
     color: inherit; 
     
-    white-space: pre-wrap;   /* Key: wraps the long line to the next row */
-    word-break: break-all;  /* Key: breaks long strings if no spaces exist */
-    overflow-x: hidden;     /* Removes the horizontal scrollbar entirely */
-    width: 100%;            /* Forces it to respect the parent's width */
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: hidden;
+    width: 100%; 
   }
   .msg-body table { border-collapse: collapse; width: 100%; margin: 0.65em 0; font-size: 13px; }
   .msg-body th,.msg-body td { border: 1px solid var(--border); padding: 6px 12px; text-align: left; }
@@ -182,8 +180,8 @@
 <div id="paste-toast">📋 Image pasted!</div>
 
 <script>
-const STREAM_URL = "https://hamburger-extra-cheddargpt-no-pickles.fauilting.workers.dev";
-const DEBUG_MODE = false;
+  const STREAM_URL = "https://hamburger-extra-cheddargpt-no-pickles.fauilting.workers.dev";
+  const DEBUG_MODE = false;
 
   const splashes = [
     "cheddar noooooooooooo",
@@ -204,8 +202,7 @@ const DEBUG_MODE = false;
     }
   }
 
-  const DEBUG_RESPONSE = `## Debug Test Response
-This is a **debug message** — *no API credits were used*.`;
+  const DEBUG_RESPONSE = `## Debug Test Response\nThis is a **debug message** — *no API credits were used*.`;
 
   marked.use({
     breaks: true, gfm: true,
@@ -226,15 +223,15 @@ This is a **debug message** — *no API credits were used*.`;
       .then(() => { btn.textContent = 'copied!'; setTimeout(() => btn.textContent = 'copy', 1500); });
   }
 
-  const log          = document.getElementById('log');
-  const chatInput   = document.getElementById('chat-input');
-  const sendBtn     = document.getElementById('send-btn');
-  const statusPill  = document.getElementById('status-pill');
+  const log       = document.getElementById('log');
+  const chatInput = document.getElementById('chat-input');
+  const sendBtn   = document.getElementById('send-btn');
+  const statusPill = document.getElementById('status-pill');
   const debugToggle = document.getElementById('debug-toggle');
-  const attachBtn   = document.getElementById('attach-btn');
-  const fileInput   = document.getElementById('file-input');
-  const tray        = document.getElementById('attachment-tray');
-  const pasteToast  = document.getElementById('paste-toast');
+  const attachBtn  = document.getElementById('attach-btn');
+  const fileInput  = document.getElementById('file-input');
+  const tray       = document.getElementById('attachment-tray');
+  const pasteToast = document.getElementById('paste-toast');
 
   debugToggle.checked = DEBUG_MODE;
 
@@ -395,7 +392,7 @@ This is a **debug message** — *no API credits were used*.`;
   function removeCheeseLoader() { document.getElementById('cheese-loader')?.remove(); }
 
   async function send() {
-    const text  = chatInput.value.trim();
+    const text = chatInput.value.trim();
     const files = [...pendingFiles];
     if (!text && files.length === 0) return;
 
@@ -418,20 +415,26 @@ This is a **debug message** — *no API credits were used*.`;
       return;
     }
 
-    const parts = [];
+    const messageContent = [];
     for (const f of files) {
       if (f.isImage) {
-        parts.push({ inline_data: { mime_type: f.mimeType, data: f.dataUrl.split(',')[1] } });
+        messageContent.push({
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: f.mimeType,
+            data: f.dataUrl.split(',')[1]
+          }
+        });
       } else {
-        try { parts.push({ text: `[File: ${f.name}]\n\`\`\`\n${atob(f.dataUrl.split(',')[1])}\n\`\`\`` }); }
-        catch { parts.push({ text: `[Attached: ${f.name}]` }); }
+        messageContent.push({ type: "text", text: `[File: ${f.name}]\n${atob(f.dataUrl.split(',')[1])}` });
       }
     }
-    if (text) parts.push({ text });
-    history.push({ role: 'user', parts });
+    if (text) messageContent.push({ type: "text", text });
+
+    history.push({ role: 'user', content: messageContent });
 
     showCheeseLoader();
-    await new Promise(r => setTimeout(r, 1000));
     removeCheeseLoader();
 
     const bodyEl = createStreamMsg();
@@ -441,47 +444,53 @@ This is a **debug message** — *no API credits were used*.`;
       const res = await fetch(STREAM_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: history })
+        body: JSON.stringify({ 
+          model: "claude-3-haiku-20240307", 
+          max_tokens: 2048,
+          stream: true,
+          messages: history 
+        })
       });
 
       if (!res.ok) {
-        const errData = await res.json();
+        const errText = await res.text();
         document.getElementById('stream-msg')?.remove();
-        appendMsg('error', errData?.error?.message || 'API error ' + res.status);
+        appendMsg('error', 'API Error: ' + res.status);
         history.pop(); setStatus('error', 'error');
         busy = false; sendBtn.disabled = false;
         return;
       }
 
-      const reader  = res.body.getReader();
+      const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = '';
-
+      
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop();
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
 
         for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const raw = line.slice(6).trim();
-          if (raw === '[DONE]') continue;
-          try {
-            const chunk = JSON.parse(raw)?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            if (chunk) {
-              accumulated += chunk;
-              bodyEl.classList.add('streaming-cursor');
-              bodyEl.innerHTML = marked.parse(accumulated);
-              log.scrollTop = log.scrollHeight;
-            }
-          } catch {}
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') break;
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.type === 'content_block_delta') {
+                accumulated += parsed.delta.text;
+                bodyEl.classList.add('streaming-cursor');
+                bodyEl.innerHTML = marked.parse(accumulated);
+                log.scrollTop = log.scrollHeight;
+              }
+            } catch (e) {}
+          }
         }
       }
 
       bodyEl.classList.remove('streaming-cursor');
-      history.push({ role: 'model', parts: [{ text: accumulated }] });
+      history.push({ role: 'assistant', content: accumulated });
       setStatus('ready', 'ready');
 
     } catch (err) {
