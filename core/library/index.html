@@ -398,7 +398,7 @@
 </div>
 
 <script>
-const OS_VERSION = "v1.0.0b";
+const OS_VERSION = "v1.0.1";
 const ANNOUNCEMENT_TEXT = "ADs are now in Cheddar, I tried making them non-invasive as possible";
 const ADS_ENABLED = true;
 
@@ -431,19 +431,23 @@ function getGameDir() { return `${REPO_BASE}@${LATEST_SHA}/games`; }
 function getToolDir() { return `${REPO_BASE}@${LATEST_SHA}/core/library/tools`; }
 
 const sites = {
-  "snowrider":     { name: "Snow Rider 3D",           enabled: true,  src: "snow-rider3d",      desc: "Race down snowy slopes in this addictive 3D skiing game." },
-  "retrobowl":     { name: "Retro Bowl",              enabled: true,  src: "retro-bowl",         desc: "Run your own football team in this retro-style sports game." },
-  "wrestlebros":   { name: "Wrestle Bros",            enabled: false, src: "wrestle-bros",       desc: "2-player wrestling fun. Currently offline." },
-  "potato":        { name: "Throw a Potato",          enabled: true,  src: "throw-a-potato",     desc: "Exactly what it sounds like. Throw potatoes." },
-  "drifthunters":  { name: "Drift Hunters",           enabled: true,  src: "drift-hunters",      desc: "Earn cash by drifting and upgrade your car to the max." },
-  "basketball":    { name: "Basketball Legends 2020", enabled: false, src: "basketball-legends", desc: "Play as legendary basketball stars." },
-  "cheddarclicker":{ name: "Cheddar Clicker",         enabled: true,  src: "cheddar-clicker",    desc: "VINNYYY!!! NUCCHHIII!!" },
-  "bloonstd4":     { name: "Bloons Tower Defense 4",  enabled: true,  src: "bloons-td4",         desc: "Pop bloons and defend your territory in this classic tower defense game." },
-  "geometrydash":  { name: "Geometry Dash Lite",      enabled: true, src: "geometry-dash",      desc: "Disabled — original IP." },
-  "minecraft":     { name: "Minecraft v1.12.2",       enabled: true, src: "minecraft",          desc: "Disabled — original IP." },
-  "zombies":       { name: "CoD Zombies",             enabled: true, src: "nz-zombies",         desc: "Disabled — original IP." },
-  "sm64":          { name: "Super Mario 64",          enabled: true, src: "sm64",               desc: "Disabled — original IP." },
-  "buckshot":      { name: "Buckshot Roulette",       enabled: true, src: "buckshot-roulette",  desc: "Disabled — original IP." },
+ "snowrider": { name: "Snow Rider 3D",           enabled: true,  src: "snow-rider3d",      desc: "no desc currently" },
+ "retrobowl": { name: "Retro Bowl",              enabled: true,  src: "retro-bowl",         desc: "no desc currently" },
+ "wrestlebros": { name: "Wrestle Bros",            enabled: false, src: "wrestle-bros",       desc: "no desc currently" },
+ "potato": { name: "Throw a Potato",          enabled: true,  src: "throw-a-potato",     desc: "no desc currently" },
+ "drifthunters": { name: "Drift Hunters",           enabled: true,  src: "drift-hunters",      desc: "no desc currently" },
+ "basketball": { name: "Basketball Legends 2020", enabled: false, src: "basketball-legends", desc: "no desc currently" },
+ "cheddarclicker": { name: "Cheddar Clicker",         enabled: true,  src: "cheddar-clicker",    desc: "no desc currently" },
+ "bloonstd4": { name: "Bloons Tower Defense 4",  enabled: true,  src: "bloons-td4",         desc: "no desc currently" },
+ "geometrydash": { name: "Geometry Dash Lite",      enabled: true, src: "geometry-dash",      desc: "no desc currently" },
+ "minecraft": { name: "Minecraft v1.12.2",       enabled: true, src: "minecraft",          desc: "no desc currently" },
+ "zombies": { name: "CoD Zombies",             enabled: true, src: "nz-zombies",         desc: "no desc currently" },
+ "sm64": { name: "Super Mario 64",          enabled: true, src: "sm64",               desc: "no desc currently" },
+ "buckshot": { name: "Buckshot Roulette",       enabled: true, src: "buckshot-roulette",  desc: "no desc currently" },
+ "fnaf1": { name: "Five Nights at Freddy's", enabled: true, src: "fnaf1", desc: "no desc currently" },
+ "fnaf2": { name: "Five Nights at Freddy's 2", enabled: true, src: "fnaf2", desc: "no desc currently" },
+ "fnaf3": { name: "Five Nights at Freddy's 3", enabled: true, src: "fnaf3", desc: "no desc currently" },
+ "fnaf4": { name: "Five Nights at Freddy's 4", enabled: true, src: "fnaf4", desc: "no desc currently" },
 };
 
 const tools = {
@@ -452,9 +456,11 @@ const tools = {
   "gpt":         { name: "CheddarGPT",             enabled: true, src: "gpt" },
 };
 
+ // TEMPLATE -  { ver: "", date: "", items: [""] },
 const changelogData = [
-  { ver: "v1.0.0",       date: "3/30/2026", items: ["CheddarOS officially released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
-  { ver: "vBETA-1.0.0",  date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
+ { ver: "v1.0.1", date: "3/31/2026", items: ["Offically went public!","Added FNaF 1-4", "CheddarGPT is undermaintaince while I fix the API","Advertisments added because I wasnt getting paid and this is a hobby project to me"] },
+  { ver: "v1.0.0", date: "3/30/2026", items: ["CheddarOS officially released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
+  { ver: "vBETA-1.0.0", date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
   { ver: "vALPHA-2.1.3", date: "3/14/2026", items: ["Fixed Bloons TD4"] },
   { ver: "vALPHA-2.1.2", date: "3/13/2026", items: ["Added Bloons TD4","Fixed formatting","Minor bug fixes"] },
   { ver: "vALPHA-2.1.1", date: "3/11/2026", items: ["Added Basketball Legends","Basketball Legends offline while looking for GoGuardian bypass"] },
