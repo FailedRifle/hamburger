@@ -94,19 +94,6 @@
   .page { display: none; padding: 28px 32px; }
   .page.active { display: block; }
 
-  .ad-slot {
-    background: var(--panel-bg);
-    border: 1px dashed var(--border);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-muted); font-size: 11px;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-  .ad-slot-banner { width: 100%; height: 90px; }
-  .ad-slot-rect { width: 300px; height: 250px; flex-shrink: 0; }
-  .ad-slot-native { width: 100%; height: 120px; }
-
   .home-whats-new { margin-bottom: 32px; }
   .home-whats-new h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
   .home-whats-new .ver-tag { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
@@ -399,24 +386,12 @@
 
 <script>
 const OS_VERSION = "v1.0.1a";
-const ANNOUNCEMENT_TEXT = "ADs are now in Cheddar, I tried making them non-invasive as possible";
-const ADS_ENABLED = true;
-
-if (ADS_ENABLED) {
-  const s = document.createElement('script');
-  s.src = "https://cheddar.fauilting.workers.dev";
-  document.head.appendChild(s);
-}
+const ANNOUNCEMENT_TEXT = "im gonna add some ads soon";
 
 document.getElementById("logo-ver").textContent = OS_VERSION;
 document.getElementById("home-ver").textContent = OS_VERSION;
 document.getElementById("info-ver").textContent = OS_VERSION;
 document.title = `CheddarOS ${OS_VERSION}`;
-
-if (!ADS_ENABLED) {
-  document.querySelectorAll('.ad-slot').forEach(el => el.remove());
-  document.getElementById('ad-mobile-banner')?.remove();
-}
 
 if (ANNOUNCEMENT_TEXT.trim()) {
   const nb = document.getElementById("notice-bar");
@@ -458,7 +433,7 @@ const tools = {
 
  // TEMPLATE -  { ver: "", date: "", items: [""] },
 const changelogData = [
- { ver: "v1.0.1", date: "3/31/2026", items: ["Offically went public!","Added FNaF 1-4", "CheddarGPT is undermaintaince while I fix the API","Advertisments added because I wasnt getting paid and this is a hobby project to me"] },
+ { ver: "v1.0.1", date: "3/31/2026", items: ["Offically went public!","Added FNaF 1-4", "CheddarGPT is undermaintaince while I fix the API"] },
   { ver: "v1.0.0", date: "3/30/2026", items: ["CheddarOS officially released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
   { ver: "vBETA-1.0.0", date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
   { ver: "vALPHA-2.1.3", date: "3/14/2026", items: ["Fixed Bloons TD4"] },
