@@ -385,8 +385,8 @@
 </div>
 
 <script>
-const OS_VERSION = "v1.0.1a";
-const ANNOUNCEMENT_TEXT = "im gonna add some ads soon";
+const OS_VERSION = "v1.0.1b";
+const ANNOUNCEMENT_TEXT = "";
 
 document.getElementById("logo-ver").textContent = OS_VERSION;
 document.getElementById("home-ver").textContent = OS_VERSION;
@@ -510,7 +510,7 @@ async function updateCloudflareStats() {
 updateCloudflareStats();
 
 function buildPopularGrid() {
-  const popularKeys = ["zombies","drifthunters","fnaf4","potato"];
+  const popularKeys = ["zombies","drifthunters","cheddarclicker","potato"];
   const grid = document.getElementById("popular-grid");
   popularKeys.forEach(key => {
     const s = sites[key];
