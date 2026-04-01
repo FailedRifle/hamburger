@@ -283,20 +283,61 @@
           <div id="container-c729d56dcc7254130b6a0c0bf80b5723"></div>
         </div>
 
-<button 
-  onclick="window.open('https://seenimplieddump.com/m0pdp625?key=0684064dcc7b283677be8cf2a14f748e', '_blank')"
-  style="
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    color: var(--accent);
-    font-family: var(--font);
-    font-size: 13px;
-    padding: 10px 24px;
-    cursor: pointer;
-    margin: 16px 0;
+<!-- Welcome Modal -->
+<div id="welcome-modal" style="
+  display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); z-index: 9999;
+  align-items: center; justify-content: center;
+">
+  <div style="
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 40px 36px; max-width: 420px; width: 90%;
+    text-align: center; font-family: var(--font);
   ">
-  ⭐ Support CheddarOS
-</button>
+    <h2 style="color: var(--accent); font-size: 22px; margin-bottom: 4px;">Welcome to CheddarOS</h2>
+    <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 20px;" id="welcome-ver"></div>
+    <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 28px; line-height: 1.65;">
+      CheddarOS is a solo hobby project of mine, this prompt will only show up when you open CheddarOS.
+    </p>
+    <button onclick="
+      window.open('https://seenimplieddump.com/m0pdp625?key=0684064dcc7b283677be8cf2a14f748e', '_blank');
+      document.getElementById('welcome-modal').style.display='none';
+      document.getElementById('thankyou-modal').style.display='flex';
+    " style="
+      background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--accent); font-family: var(--font);
+      font-size: 14px; font-weight: 700; padding: 12px 32px;
+      cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
+      width: 100%; margin-bottom: 12px;
+    ">⭐ Support CheddarOS</button>
+    <p style="color: var(--text-dim); font-size: 12px;">
+      free of charge
+    </p>
+  </div>
+</div>
+
+<div id="thankyou-modal" style="
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); z-index: 9999;
+  align-items: center; justify-content: center;
+">
+  <div style="
+    background: var(--panel-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 40px; max-width: 380px; width: 90%;
+    text-align: center; font-family: var(--font);
+  ">
+    <h2 style="color: var(--accent); font-size: 22px; margin-bottom: 8px;">Thank You!</h2>
+    <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 24px; line-height: 1.6;">
+      Your support helps motivate me to continue working on this project!
+    </p>
+    <button onclick="document.getElementById('thankyou-modal').style.display='none'" style="
+      background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--accent); font-family: var(--font);
+      font-size: 14px; font-weight: 700; padding: 12px 32px;
+      cursor: pointer; letter-spacing: 1px;
+    ">CLOSE</button>
+  </div>
+</div>
 
 <div class="home-popular">
   <h3>Popular Games</h3>
@@ -387,26 +428,23 @@
           </div>
         </div>
       </div>
-
       <div id="tool-page">
         <div class="tool-header" id="tool-header">Tool name</div>
         <div class="tool-frame-wrap">
-          <div class="tool-placeholder">Write the tool html here</div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
 <script>
 const OS_VERSION = "v1.0.1b";
-const ANNOUNCEMENT_TEXT = "";
+const ANNOUNCEMENT_TEXT = "Thank you for supporting the development of CheddarOS";
 
 document.getElementById("logo-ver").textContent = OS_VERSION;
 document.getElementById("home-ver").textContent = OS_VERSION;
 document.getElementById("info-ver").textContent = OS_VERSION;
-document.title = `CheddarOS ${OS_VERSION}`;
+document.getElementById("welcome-ver").textContent = OS_VERSION
 
 if (ANNOUNCEMENT_TEXT.trim()) {
   const nb = document.getElementById("notice-bar");
