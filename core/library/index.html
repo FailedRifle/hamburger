@@ -479,8 +479,8 @@ const changelogData = [
 
 const creditsData = [
   { role: "LEAD PROGRAMMER", people: ["Matt Hauber (Cheddar Hobbs)"] },
-  { role: "CONTRIBUTORS",    people: ["Matt Marakovits","Joey Lombardo (Joronster)","Alex Falana"] },
-  { role: "TESTERS",         people: ["Jadell Vargas (Jelly)","Vinny Nucci (Vinchenzo)","Max Dankies","Tyler Hartman"] },
+  { role: "CONTRIBUTORS", people: ["Matt Marakovits","Joey Lombardo (Joronster)","Alex Falana"] },
+  { role: "TESTERS", people: ["Jadell Vargas (Jelly)","Vinnie Nucci (Vinchenzo)","Max Dankies","Tyler Hartman","Juan Sosa","Dean Albanese (DJ)","Stephen Schall (Steve Diggs"] },
 ];
 const creditsDisclaimer = "All Testers and Contributors are not affiliated in any way with the development of CheddarOS.";
 
@@ -528,7 +528,7 @@ async function updateCloudflareStats() {
 updateCloudflareStats();
 
 function buildPopularGrid() {
-  const popularKeys = ["zombies","drifthunters","cheddarclicker","potato"];
+  const popularKeys = ["zombies","drifthunters","buckshot","potato"];
   const grid = document.getElementById("popular-grid");
   popularKeys.forEach(key => {
     const s = sites[key];
