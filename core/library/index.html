@@ -24,8 +24,6 @@
   }
   html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); }
 
-  #app { display: flex; flex-direction: column; height: 100vh; }
-
   #header {
     display: flex; align-items: center;
     height: var(--header-h); min-height: var(--header-h);
@@ -59,6 +57,35 @@
   }
 
   #body { display: flex; flex: 1; overflow: hidden; }
+
+#terminal-loader {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #0c0c0c;
+  color: #cccccc;
+  font-family: 'Consolas', 'Lucida Console', monospace;
+  font-size: 14px;
+  padding: 20px;
+  z-index: 10000;
+  overflow-y: auto;
+}
+.term-line { margin-bottom: 4px; line-height: 1.4; }
+.term-blue { color: #3b78ff; }
+.term-green { color: #16c60c; }
+.term-yellow { color: #f9f1a5; }
+.term-cursor {
+  display: inline-block;
+  width: 8px; height: 15px;
+  background: #cccccc;
+  animation: blink 0.8s infinite;
+  vertical-align: middle;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  #app { display: none; }
+   #app { display: flex; flex-direction: column; height: 100vh; }
+
 
   #sidebar {
     width: var(--sidebar-w); min-width: var(--sidebar-w);
@@ -209,6 +236,7 @@
     border-radius: 4px; font-size: 14px; color: var(--red);
   }
 
+
   #tool-page {
     display: none;
     padding: 0;
@@ -233,7 +261,10 @@
 </head>
 <body>
 <div id="app">
-
+ <div id="terminal-loader">
+  <div id="terminal-content"></div>
+  <div class="term-line">C:\Users\Cheddar> <span class="term-cursor"></span></div>
+</div>
   <div id="header">
     <div id="logo">
       <h1>CheddarOS <span class="ver" id="logo-ver"></span></h1>
@@ -450,7 +481,7 @@ const tools = {
 
  // TEMPLATE -  { ver: "v", date: "", items: [""] },
 const changelogData = [
- { ver: "v1.0.2", date: "4/2/2026", items: ["Added a little welcome message every time you open the app"] },
+ { ver: "v1.0.2", date: "4/2/2026", items: ["Added a little welcome message every time you open the app","Added a pre-load so everything can load smoothly without lag and or delay"] },
  { ver: "v1.0.1", date: "3/31/2026", items: ["Offically went public!","Added FNaF 1-4", "CheddarGPT is undermaintaince while I fix the API"] },
  { ver: "v1.0.0", date: "3/30/2026", items: ["CheddarOS officially released","CheddarOS whitelist is now working","Revamped UI","Removed the console commands entirely","Added CheddarGPT","Added Cheddar Form Cracker (instructions inside)"] },
  { ver: "vBETA-1.0.0", date: "3/17/2026", items: ["Finally out of alpha and into open beta","Revamped UI again to be more unique","Console, games, and the password are now under 1 tab","Welcoming new testers to CheddarOS"] },
@@ -561,6 +592,66 @@ function buildChangelogs() {
     `;
     el.appendChild(div);
   });
+}
+
+const terminalContent = document.getElementById("terminal-content");
+
+function addLine(text, type = "") {
+  const line = document.createElement("div");
+  line.className = "term-line " + type;
+  line.innerHTML = text;
+  terminalContent.appendChild(line);
+  document.getElementById("terminal-loader").scrollTop = terminalContent.scrollHeight;
+}
+
+async function runTerminalLoader() {
+  addLine("CheddarOS Terminal [" + OS_VERSION + "]");
+  addLine("(c) CheddarOS. All rights reserved.<br>");
+  await new Promise(r => setTimeout(r, 400));
+  
+  addLine("C:\\Users\\Cheddar> <span class='term-blue'>cheddaros --prepare --assets</span>");
+  await new Promise(r => setTimeout(r, 300));
+  
+  addLine("Initializing Asset Pre-fetcher...");
+  
+  const gameKeys = Object.keys(sites);
+  const totalAssets = gameKeys.length * 2;
+  let loadedCount = 0;
+
+  addLine(`<br><span class='term-yellow'>[SYSTEM] Pre-loading ${gameKeys.length} Game Manifests...</span>`);
+
+  for (const key of gameKeys) {
+    const s = sites[key];
+    const iconUrl = `${getGameDir()}/${s.src}/icon.png`;
+    const bannerUrl = `${getGameDir()}/${s.src}/banner.png`;
+
+    try {
+      await Promise.all([
+        fetch(iconUrl, { mode: 'no-cors' }),
+        fetch(bannerUrl, { mode: 'no-cors' })
+      ]);
+      loadedCount += 2;
+      addLine(`FETCHED [${key}] -> <span class='term-green'>READY</span>`);
+    } catch (e) {
+      addLine(`FETCHED [${key}] -> <span class='term-red'>FAILED</span>`);
+    }
+    await new Promise(r => setTimeout(r, 50));
+  }
+
+  addLine("<br><span class='term-yellow'>[SYSTEM] Verifying Tool Modules...</span>");
+  for (const tKey in tools) {
+    addLine(`MOUNTING /bin/tools/${tools[tKey].src} ... <span class='term-green'>SUCCESS</span>`);
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+  addLine("<br>Finalizing system environment...");
+  await new Promise(r => setTimeout(r, 500));
+  
+  addLine("<br><span class='term-green'>All assets fetched. Starting CheddarOS...</span>");
+  await new Promise(r => setTimeout(r, 1250));
+  
+  document.getElementById("terminal-loader").style.display = "none";
+  document.getElementById("app").style.display = "flex";
 }
 
 function buildHomePreview() {
@@ -765,13 +856,14 @@ async function fetchGitHubStats() {
     document.getElementById("ic-commits").textContent = "Unavailable";
   }
 }
-
+ 
 buildSidebar();
 buildPopularGrid();
 buildChangelogs();
 buildHomePreview();
 buildCredits();
 fetchGitHubStats();
+runTerminalLoader();
 </script>
 </body>
 </html>
